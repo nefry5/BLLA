@@ -1,7 +1,14 @@
 import{useState,useEffect,useRef,useCallback,useMemo}from"react";
 let _ac=null;const AC=()=>{try{if(!_ac)_ac=new AudioContext();}catch{}return _ac;};
 function tn(f,tp,d,v=0.13,dl=0){const a=AC();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=tp;o.frequency.value=f;const t=a.currentTime+dl;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d+.05);}
-const SFX={flip:()=>{tn(480,"sine",.06,.08);tn(640,"sine",.06,.07,.05)},ok:()=>{[523,659,784].forEach((f,i)=>tn(f,"sine",.12,.14,i*.08))},wrong:()=>{tn(280,"sawtooth",.07,.12);tn(200,"sawtooth",.09,.09,.09)},perfect:()=>{[523,659,784,1047,1319].forEach((f,i)=>tn(f,"sine",.18,.17,i*.07))},rankup:()=>{[440,554,659,880,1100].forEach((f,i)=>tn(f,"sine",.22,.24,i*.07))},quest:()=>{[523,784,1047].forEach((f,i)=>tn(f,"sine",.1,.16,i*.08))},loot:()=>{[330,440,554,659,880].forEach((f,i)=>tn(f,"triangle",.18,.18,i*.09))},rTick:(s)=>tn(200+s*500,"square",.02,.05),rWin:()=>{[523,784,1047,1319].forEach((f,i)=>tn(f,"sine",.25,.22,i*.08))},milestone:()=>{[440,554,659,880].forEach((f,i)=>tn(f,"sine",.15,.19,i*.08))},platinum:()=>{[523,659,784,1047,1319,1568].forEach((f,i)=>tn(f,"sine",.2,.22,i*.07))},nav:()=>tn(440,"sine",.05,.07),focus:()=>{tn(220,"sine",.18,.13);tn(330,"triangle",.18,.09,.1)}};
+const SFX={flip:()=>{tn(480,"sine",.06,.08);tn(640,"sine",.06,.07,.05)},ok:()=>{[523,659,784].forEach((f,i)=>tn(f,"sine",.12,.14,i*.08))},wrong:()=>{tn(280,"sawtooth",.07,.12);tn(200,"sawtooth",.09,.09,.09)},perfect:()=>{[523,659,784,1047,1319].forEach((f,i)=>tn(f,"sine",.18,.17,i*.07))},rankup:()=>{[440,554,659,880,1100].forEach((f,i)=>tn(f,"sine",.22,.24,i*.07))},quest:()=>{[523,784,1047].forEach((f,i)=>tn(f,"sine",.1,.16,i*.08))},loot:()=>{[330,440,554,659,880].forEach((f,i)=>tn(f,"triangle",.18,.18,i*.09))},rTick:(s)=>tn(200+s*500,"square",.02,.05),rWin:()=>{[523,784,1047,1319].forEach((f,i)=>tn(f,"sine",.25,.22,i*.08))},milestone:()=>{[440,554,659,880].forEach((f,i)=>tn(f,"sine",.15,.19,i*.08))},platinum:()=>{[523,659,784,1047,1319,1568].forEach((f,i)=>tn(f,"sine",.2,.22,i*.07))},nav:()=>tn(440,"sine",.05,.07),focus:()=>{tn(220,"sine",.18,.13);tn(330,"triangle",.18,.09,.1)},
+lootC:()=>tn(523,"sine",.1,.13),
+lootR:()=>{[523,659].forEach((f,i)=>tn(f,"sine",.15,.14,i*.07))},
+lootSR:()=>{[523,659,784].forEach((f,i)=>tn(f,"sine",.2,.16,i*.06))},
+lootE:()=>{[440,554,659,880].forEach((f,i)=>tn(f,"sine",.24,.2,i*.07))},
+lootL:()=>{[523,659,784,1047,1319].forEach((f,i)=>tn(f,"sine",.3,.24,i*.07))},
+lootS:()=>{[261,330,523,784,1047].forEach((f,i)=>tn(f,"triangle",.38,.3,i*.09));tn(220,"sawtooth",.2,.12,.45)}
+};
 const getScore=r=>r==null?null:r/10,updateRaw=(r,ok)=>Math.max(0,Math.min(100,(r??0)+(ok?10:-20))),noteCol=s=>s==null?"#444":s<4?"#e74c3c":s<7?"#f39c12":"#27ae60",xpGain=s=>10+Math.floor(Math.min(s,1000)/2),genUUID=()=>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&0x3|0x8)).toString(16);});
 const RANK_XP=[0,1000,4000,10000,20000,35000,60000];
 const RANKS=[{id:"wood",l:"Bois",col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",nStars:1,wings:false},{id:"bronze",l:"Bronze",col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",nStars:2,wings:false},{id:"silver",l:"Argent",col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",nStars:2,wings:false},{id:"gold",l:"Or",col:"#ffd700",glow:"#ffe44d",sf:"#FFD700",si:"#2266AA",ss:"#FFF44D",nStars:3,wings:true},{id:"diamond",l:"Diamant",col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",nStars:4,wings:true},{id:"plat",l:"Platine",col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",nStars:5,wings:true},{id:"solar",l:"Solaire",col:"#ff9800",glow:"#ffcc44",sf:"#FF6600",si:"#AA2200",ss:"#FFE044",nStars:5,wings:true}];
@@ -109,13 +116,79 @@ function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+si
 
 function ChestSVG({level,type,size=56}){const c={wood:{body:"#4a1e08",lid:"#7a3510",band:"#cd7f32",lock:"#e8a050"},gold:{body:"#6b4800",lid:"#aa7700",band:"#ffd700",lock:"#fff59d"},leg:{body:"#1a0030",lid:"#3d0070",band:"#9b00ff",lock:"#cc88ff"}}[level]||{body:"#333",lid:"#555",band:"#888",lock:"#aaa"};const tc=type==="theme"?"#4ecdc4":"#ff9966";return(<svg width={size} height={size} viewBox="0 0 60 60"><rect x="4" y="30" width="52" height="22" rx="4" fill={c.body} stroke={c.band} strokeWidth="1.5"/><path d="M4 20 Q4 12 30 12 Q56 12 56 20 L56 32 L4 32 Z" fill={c.lid} stroke={c.band} strokeWidth="1.5"/><rect x="4" y="30" width="52" height="4" fill={c.band} opacity=".65"/><rect x="25" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="31" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="22" y="33" width="16" height="10" rx="2" fill={c.band}/><circle cx="30" cy="37" r="3" fill={c.lock}/><ellipse cx="18" cy="18" rx="8" ry="3.5" fill="rgba(255,255,255,.18)"/><text x="30" y="27" textAnchor="middle" fontSize="9" fill={tc} fontWeight="900" fontFamily="Arial">{type==="theme"?"DA":"SK"}</text></svg>);}
 
+
+function ThemeIcon({k,th,size=36}){
+  const s=size,acc=th.acc;
+  const shapes={
+    default:()=>[<circle key="o" cx={s*.5} cy={s*.5} r={s*.3} fill="none" stroke={acc} strokeWidth=".8" opacity=".6"/>,...[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;return<circle key={a} cx={s*.5+s*.28*Math.cos(r)} cy={s*.5+s*.28*Math.sin(r)} r=".9" fill={acc} opacity=".8"/>})],
+    zen:()=>[<path key="w" d={`M${s*.08},${s*.65}C${s*.25},${s*.35} ${s*.45},${s*.55} ${s*.5},${s*.45}S${s*.75},${s*.3} ${s*.92},${s*.5}`} fill="none" stroke={acc} strokeWidth="1.3" strokeLinecap="round" opacity=".85"/>,<circle key="c" cx={s*.5} cy={s*.45} r="1.5" fill={acc} opacity=".9"/>],
+    arctic:()=>[0,30,60].flatMap(a=>{const r=a*Math.PI/180,l=s*.38,cx=s*.5,cy=s*.5;return[<line key={"p"+a} x1={cx} y1={cy} x2={cx+l*Math.cos(r)} y2={cy+l*Math.sin(r)} stroke={acc} strokeWidth=".9" opacity=".8"/>,<line key={"n"+a} x1={cx} y1={cy} x2={cx-l*Math.cos(r)} y2={cy-l*Math.sin(r)} stroke={acc} strokeWidth=".9" opacity=".8"/>]}),
+    sakura:()=>[...[0,72,144,216,288].map(a=>{const r=a*Math.PI/180,cx=s*.5+s*.22*Math.cos(r),cy=s*.5+s*.22*Math.sin(r);return<ellipse key={a} cx={cx} cy={cy} rx={s*.1} ry={s*.065} fill={acc} opacity=".75" transform={`rotate(${a},${cx},${cy})`}/>}),<circle key="c" cx={s*.5} cy={s*.5} r={s*.07} fill="#ffccdd"/>],
+    desert:()=>[<path key="d" d={`M${s*.05},${s*.72}Q${s*.25},${s*.45}${s*.5},${s*.58}T${s*.95},${s*.48}`} fill="none" stroke={acc} strokeWidth="1.2" opacity=".75" strokeLinecap="round"/>,<circle key="s" cx={s*.72} cy={s*.28} r={s*.09} fill={acc} opacity=".55"/>],
+    abyss:()=>[...[[s*.2,s*.38],[s*.5,s*.52],[s*.78,s*.32]].map(([cx,cy],i)=><circle key={i} cx={cx} cy={cy} r={s*.06+i*s*.01} fill="none" stroke={acc} strokeWidth=".8" opacity=".8"/>),<path key="w" d={`M${s*.08},${s*.72}Q${s*.38},${s*.58}${s*.62},${s*.68}T${s*.92},${s*.62}`} fill="none" stroke={acc} strokeWidth=".8" opacity=".45"/>],
+    pixel:()=>{const c=[];for(let px=0;px<3;px++)for(let py=0;py<3;py++)if((px+py)%2===0)c.push(<rect key={px*3+py} x={s*.18+px*s*.22} y={s*.18+py*s*.22} width={s*.19} height={s*.19} fill={acc} opacity={.5+py*.15}/>);return c;},
+    jungle:()=>[<path key="v" d={`M${s*.5},${s*.88}L${s*.5},${s*.28}M${s*.5},${s*.48}L${s*.24},${s*.33}M${s*.5},${s*.62}L${s*.76},${s*.47}`} stroke={acc} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity=".85"/>],
+    volcano:()=>[<path key="m" d={`M${s*.08},${s*.85}L${s*.5},${s*.22}L${s*.92},${s*.85}Z`} fill="none" stroke={acc} strokeWidth="1.2" opacity=".7"/>,<path key="f" d={`M${s*.44},${s*.22}C${s*.4},${s*.1}${s*.56},${s*.08}${s*.5},${s*.18}`} stroke="#ff5500" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity=".9"/>],
+    steam:()=>[<circle key="g" cx={s*.5} cy={s*.55} r={s*.24} fill="none" stroke={acc} strokeWidth="1.1" opacity=".7"/>,<rect key="r" x={s*.43} y={s*.48} width={s*.14} height={s*.14} fill={acc} opacity=".55"/>,<line key="h1" x1={s*.26} y1={s*.55} x2={s*.36} y2={s*.55} stroke={acc} strokeWidth="1.1" opacity=".7"/>,<line key="h2" x1={s*.64} y1={s*.55} x2={s*.74} y2={s*.55} stroke={acc} strokeWidth="1.1" opacity=".7"/>],
+    cyber:()=>[<rect key="b" x={s*.12} y={s*.38} width={s*.76} height={s*.3} rx="2.5" fill="none" stroke={acc} strokeWidth=".9" opacity=".65"/>,<line key="l1" x1={s*.22} y1={s*.28} x2={s*.38} y2={s*.28} stroke={acc} strokeWidth=".9" opacity=".8"/>,<line key="l2" x1={s*.38} y1={s*.28} x2={s*.38} y2={s*.38} stroke={acc} strokeWidth=".9" opacity=".8"/>,<circle key="d" cx={s*.65} cy={s*.53} r={s*.06} fill={acc} opacity=".9"/>],
+    scriptorium:()=>[<line key="l1" x1={s*.12} y1={s*.33} x2={s*.88} y2={s*.33} stroke={acc} strokeWidth=".8" opacity=".6"/>,<line key="l2" x1={s*.12} y1={s*.48} x2={s*.88} y2={s*.48} stroke={acc} strokeWidth=".8" opacity=".6"/>,<line key="l3" x1={s*.12} y1={s*.63} x2={s*.72} y2={s*.63} stroke={acc} strokeWidth=".8" opacity=".6"/>,<path key="q" d={`M${s*.12},${s*.24}C${s*.18},${s*.12}${s*.32},${s*.12}${s*.32},${s*.24}`} fill="none" stroke={acc} strokeWidth="1.2" opacity=".8"/>],
+    cosmos:()=>[...[[s*.28,s*.32],[s*.52,s*.62],[s*.72,s*.38],[s*.18,s*.68],[s*.82,s*.58]].map(([cx,cy],i)=><circle key={i} cx={cx} cy={cy} r={i%2===0?"1.3":".8"} fill={acc} opacity={.6+i*.08}/>),<ellipse key="e" cx={s*.5} cy={s*.5} rx={s*.36} ry={s*.14} fill="none" stroke={acc} strokeWidth=".8" opacity=".4" transform={`rotate(-18,${s*.5},${s*.5})`}/>],
+    spectre:()=>[<path key="g" d={`M${s*.33},${s*.82}L${s*.33},${s*.38}Q${s*.33},${s*.22}${s*.5},${s*.22}Q${s*.67},${s*.22}${s*.67},${s*.38}L${s*.67},${s*.82}L${s*.58},${s*.72}L${s*.5},${s*.82}L${s*.42},${s*.72}Z`} fill={acc} opacity=".45" stroke={acc} strokeWidth=".7"/>],
+    royal:()=>[<path key="c" d={`M${s*.22},${s*.62}L${s*.22},${s*.44}L${s*.34},${s*.33}L${s*.5},${s*.41}L${s*.66},${s*.33}L${s*.78},${s*.44}L${s*.78},${s*.62}Z`} fill="none" stroke={acc} strokeWidth="1.3" opacity=".85"/>,<circle key="j" cx={s*.5} cy={s*.37} r={s*.055} fill={acc} opacity=".9"/>],
+    bloodmoon:()=>[<circle key="m" cx={s*.5} cy={s*.48} r={s*.32} fill="none" stroke={acc} strokeWidth="1.3" opacity=".8"/>,<path key="b" d={`M${s*.5},${s*.16}A${s*.32},${s*.32} 0 0 1 ${s*.5},${s*.8}`} fill={acc} opacity=".25"/>],
+    arcane:()=>[<polygon key="c" points={[0,45,90,135,180,225,270,315].map(a=>{const r=a*Math.PI/180,d=a%90===0?s*.36:s*.21;return`${s*.5+d*Math.cos(r)},${s*.5+d*Math.sin(r)}`;}).join(" ")} fill="none" stroke={acc} strokeWidth=".9" opacity=".75"/>],
+    void_th:()=>[<circle key="o" cx={s*.5} cy={s*.5} r={s*.34} fill="none" stroke={acc} strokeWidth="1.5" opacity=".6"/>,<circle key="i" cx={s*.5} cy={s*.5} r={s*.14} fill={acc} opacity=".4"/>],
+    prism:()=>[<polygon key="t" points={`${s*.5},${s*.13} ${s*.87},${s*.82} ${s*.13},${s*.82}`} fill="none" stroke={acc} strokeWidth=".9" opacity=".7"/>,<line key="r" x1={s*.5} y1={s*.82} x2={s*.5} y2={s*.13} stroke="rgba(255,80,80,.55)" strokeWidth=".6"/>,<line key="g2" x1={s*.5} y1={s*.82} x2={s*.87} y2={s*.82} stroke="rgba(80,255,80,.55)" strokeWidth=".6"/>,<line key="b2" x1={s*.13} y1={s*.82} x2={s*.5} y2={s*.82} stroke="rgba(80,80,255,.55)" strokeWidth=".6"/>],
+    nexus:()=>[<text key="t" x={s*.5} y={s*.62} textAnchor="middle" fontSize={s*.36} fill={acc} fontWeight="900" opacity=".9">!</text>,<rect key="b" x={s*.08} y={s*.08} width={s*.84} height={s*.84} rx="3" fill="none" stroke={acc} strokeWidth=".9" opacity=".65" strokeDasharray="3,2"/>],
+  };
+  return(<svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{flexShrink:0,borderRadius:7,border:`2px solid ${acc}55`}}><rect width={s} height={s} rx="5" fill={th.bg}/><rect width={s} height={s} rx="5" fill={th.surf} opacity=".5"/>{(shapes[k]||shapes.default)()}</svg>);
+}
+
+function StreakBorderFlames({streak}){
+  const flames=useMemo(()=>{
+    if(streak<5)return[];
+    const t=Math.min(1,streak/100);
+    const n=Math.floor(6+t*22);
+    return Array.from({length:n},(_,i)=>{
+      const sd=((i*1664525)^(streak*31337))>>>0;
+      const r1=(sd&0xfff)/0xfff,r2=((sd>>12)&0xfff)/0xfff,r3=((sd>>24)&0xff)/0xff;
+      const side=streak>=50?(i%3===0?1:i%3===1?2:0):0;
+      return{x:5+r1*90,h:Math.round(38+t*(45+r2*200)),w:Math.round(18+t*16),dur:0.45+r3*0.9,delay:r1*1.8,side,idx:i};
+    });
+  },[streak]);
+  if(streak<5)return null;
+  const t=Math.min(1,streak/100),si=Math.min(1,streak/500);
+  const c1=streak<15?"#e67e22":streak<50?"#e74c3c":streak<200?"#c0392b":"#8e44ad";
+  const c2=streak<15?"#f39c12":streak<50?"#e74c3c":streak<200?"#e74c3c":"#c0392b";
+  const c3=streak<100?"#ffe100":"#ff4400";
+  const vig=streak>=100?`radial-gradient(ellipse at center,transparent ${Math.round(88-si*45)}%,rgba(${streak>=500?"120,0,60":"180,0,0"},${(si*.65).toFixed(2)}) 100%)`:null;
+  return(
+    <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:10,overflow:"hidden"}}>
+      {vig&&<div style={{position:"absolute",inset:0,background:vig,zIndex:2}}/>}
+      {flames.map((f)=>{
+        const base={position:"absolute" as const,width:f.w,height:f.h,zIndex:1,animation:`flameRise ${f.dur}s ${f.delay}s ease-in-out infinite alternate`};
+        const pos=f.side===0?{bottom:0,left:`${f.x}%`}:f.side===1?{left:0,bottom:`${f.x}%`,transform:`rotate(90deg) translateY(-${f.w}px)`,transformOrigin:"bottom left"}:{right:0,bottom:`${f.x}%`,transform:`rotate(-90deg) translateY(${f.w}px)`,transformOrigin:"bottom right"};
+        return(
+          <div key={f.idx} style={{...base,...pos}}>
+            <svg width="100%" height="100%" viewBox="0 0 20 60" preserveAspectRatio="none">
+              <path d={`M10,1C${8+f.idx%3},${12+f.idx%6}${4+f.idx%4},${24+f.idx%8}5,38C5,50,8,56,10,58C12,56,15,50,15,38C${16+f.idx%4},${24+f.idx%8}${12+f.idx%3},${12+f.idx%6}10,1Z`} fill={c1} opacity={0.55+si*0.35}/>
+              <path d="M10,20C9,30,7,42,8,50C9,55,10,57,10,58C10,57,11,55,12,50C13,42,11,30,10,20Z" fill={c2} opacity={0.75+si*0.2}/>
+              <path d="M10,40C9.5,48,10,55,10,58C10,55,10.5,48,10,40Z" fill={c3} opacity={0.88+si*0.1}/>
+            </svg>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Flame({streak}){if(!streak)return <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}><span style={{fontSize:22,opacity:.2}}>🔥</span><span style={{color:"#333",fontSize:13,fontWeight:700}}>0</span></div>;const t=Math.min(1,streak/100),sz=22+t*28,ns=14+t*14;const cols=streak<5?["#f39c12","#e67e22"]:streak<15?["#e74c3c","#f39c12"]:streak<40?["#c0392b","#e74c3c","#f39c12","#ffe100"]:["#8e44ad","#c0392b","#e74c3c","#f39c12","#fff"];return(<div style={{display:"flex",flexDirection:"column",alignItems:"center",lineHeight:1,gap:1}}><span style={{fontSize:sz,lineHeight:1,filter:`drop-shadow(0 0 ${4+t*12}px ${cols[0]})`,transition:"all .3s",animation:streak>=5?"flamePulse .7s ease infinite alternate":"none"}}>🔥</span><span style={{fontSize:ns,fontWeight:900,background:`linear-gradient(180deg,${cols.join(",")})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:`drop-shadow(0 0 ${2+t*6}px ${cols[0]})`,transition:"all .3s",letterSpacing:-1}}>{streak}</span></div>);}
 function ScoreBadge({raw,size=42,perfect=false}){const sc=getScore(raw),c=noteCol(sc);return(<div style={{width:size,height:size,borderRadius:"50%",border:`2.5px solid ${c}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,background:perfect?`radial-gradient(circle,${c}22,transparent)`:`${c}11`,boxShadow:perfect?`0 0 20px ${c},0 0 40px ${c}55`:`0 0 8px ${c}44`,transition:"all .4s"}}><span style={{color:c,fontSize:size*.26,fontWeight:800,lineHeight:1}}>{sc!==null?sc.toFixed(1):"–"}</span><span style={{color:c,fontSize:size*.18,lineHeight:1,opacity:.7}}>/10</span></div>);}
 function ProgressHeader({ls,T}){const{rank,xIn,xNeed,isMax,pct,nextRank}=getRankInfo(ls.xp||0);const segs=20,filled=Math.round(pct/100*segs);return(<div style={{padding:"7px 12px",background:"rgba(0,0,0,0.35)",borderBottom:`1px solid ${T.brd}`,flexShrink:0}}><div style={{display:"flex",alignItems:"center",gap:10}}><RankBadge rank={rank} size={44}/><div style={{flex:1,minWidth:0}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{color:rank.col,fontSize:13,fontWeight:900,textShadow:`0 0 10px ${rank.col}88`}}>{rank.l}</span><span style={{color:"rgba(255,255,255,.5)",fontSize:10,fontWeight:700}}>{isMax?"MAX ∞":`${xIn} / ${xNeed} XP`}</span></div><div style={{display:"flex",gap:2,padding:"2px",background:"rgba(0,0,0,0.3)",borderRadius:6}}>{Array.from({length:segs}).map((_,i)=>(<div key={i} style={{flex:1,height:10,borderRadius:2,background:i<filled?rank.col:"rgba(255,255,255,0.05)",boxShadow:i<filled?`0 0 4px ${rank.glow}`:"none",transition:"background .4s"}}/>))}</div></div>{nextRank&&<RankBadge rank={nextRank} size={24} opacity={.35}/>}<div style={{display:"flex",alignItems:"center",gap:3,flexShrink:0}}><CoinIcon size={14}/><span style={{color:"#ffd700",fontSize:11,fontWeight:700}}>{ls.coins||0}</span></div></div></div>);}
 function Particles(){const cvs=useRef(null);useEffect(()=>{const c=cvs.current;if(!c)return;const ctx=c.getContext("2d");const pts=Array.from({length:28},()=>({x:Math.random()*600,y:Math.random()*800,r:.8+Math.random()*1.8,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,col:Math.random()<.5?`rgba(${180+~~(Math.random()*75)},0,60,`:`rgba(100,0,${160+~~(Math.random()*95)},`,a:.3+Math.random()*.5}));let af;const draw=()=>{c.width=c.offsetWidth||300;c.height=c.offsetHeight||600;ctx.clearRect(0,0,c.width,c.height);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.col+p.a+")";ctx.fill();});af=requestAnimationFrame(draw);};draw();return()=>cancelAnimationFrame(af);},[]);return <canvas ref={cvs} style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}}/>;}
 
 // ── ROULETTE LOOT ─────────────────────────────────────────────────────────
-function RouletteOpening({box,wonItem,onClose}){
+function RouletteOpening({box,wonItem,onClose,alreadyOwned=false}){
   const [phase,setPhase]=useState("spin"); // spin | bounce | reveal
   const [spinPos,setSpinPos]=useState(0);
   const [finalIdx,setFinalIdx]=useState(0);
@@ -152,10 +225,10 @@ function RouletteOpening({box,wonItem,onClose}){
       setSpinPos(pos);
       if(ticks>=totalTicks){
         clearInterval(interval);
-        // snap to target
         setSpinPos(targetPos);
         setPhase("bounce");
-        setTimeout(()=>{SFX.rWin();setPhase("reveal");},350);
+        const rarSfx:{[k:string]:()=>void}={commun:SFX.lootC,rare:SFX.lootR,super_rare:SFX.lootSR,epique:SFX.lootE,legendaire:SFX.lootL,secret:SFX.lootS};
+        setTimeout(()=>{(rarSfx[wonItem.rar]||SFX.lootC)();setPhase("reveal");},350);
       }
     },30);
     tickRef.current=interval;
@@ -182,11 +255,14 @@ function RouletteOpening({box,wonItem,onClose}){
           {[...reel,...reel].map((item,i)=>{
             const r2=RARITY[item.rar]||RARITY.commun;
             return(
-              <div key={i} style={{width:ITEM_W,flexShrink:0,height:80,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3}}>
-                <div style={{width:44,height:44,borderRadius:8,background:`linear-gradient(135deg,${box.col}44,${box.col}22)`,border:`1.5px solid ${r2.col}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  <span style={{fontSize:18,color:r2.col,fontWeight:800}}>{item.secret?"?":item.name.slice(0,2)}</span>
-                </div>
-                <span style={{fontSize:9,color:r2.col,fontWeight:700,textAlign:"center",maxWidth:80,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.secret?"???":item.name}</span>
+              <div key={i} style={{width:ITEM_W,flexShrink:0,height:84,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
+                {item.secret?
+                  <div style={{width:44,height:44,borderRadius:8,background:"#0a0a0a",border:`1.5px solid ${r2.col}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:22,color:r2.col,fontWeight:900}}>?</span></div>
+                  :box.type==="skin"?(()=>{const sk=SKINS[item.id.replace("skin_","")]||SKINS.default;const Ovl=sk.ovl?SK_OVLS[sk.ovl]:null;return(<div style={{width:44,height:44,borderRadius:8,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,border:`1.5px solid ${r2.col}`,overflow:"hidden",position:"relative",flexShrink:0}}>{Ovl&&<Ovl/>}</div>);})()
+                  :(()=>{const thk=item.id.replace("theme_","");const th=THEMES[thk]||THEMES.default;return<ThemeIcon k={thk} th={th} size={44}/>;})()
+                }
+                <span style={{fontSize:9,color:r2.col,fontWeight:700,textAlign:"center",maxWidth:82,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.secret?"???":item.name}</span>
+                <span style={{fontSize:8,color:"rgba(255,255,255,.45)",fontWeight:600}}>{item.secret?"?%":Math.round(item.p*100)+"%"}</span>
               </div>
             );
           })}
@@ -195,10 +271,13 @@ function RouletteOpening({box,wonItem,onClose}){
 
       {phase==="reveal"&&(
         <div style={{textAlign:"center",animation:"popIn .5s ease"}}>
-          <div style={{fontSize:12,color:displayRar.col,marginBottom:6,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>{displayRar.l}</div>
-          <div style={{fontSize:26,fontWeight:900,color:"#fff",marginBottom:4,textShadow:`0 0 20px ${displayRar.col}`}}>{displayName}</div>
-          <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:18}}>Ajouté à votre collection</div>
-          <button onClick={onClose} style={{background:`linear-gradient(135deg,${box.col},${box.col}88)`,color:"#fff",border:"none",borderRadius:12,padding:"11px 26px",cursor:"pointer",fontWeight:700,fontSize:14}}>Super ! 🎉</button>
+          <div style={{fontSize:11,color:displayRar.col,marginBottom:5,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>{displayRar.l}</div>
+          <div style={{fontSize:26,fontWeight:900,color:"#fff",marginBottom:3,textShadow:`0 0 20px ${displayRar.col}`}}>{displayName}</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:14}}>
+            <span style={{fontSize:11,color:displayRar.col,fontWeight:700,background:`${displayRar.col}18`,border:`1px solid ${displayRar.col}44`,borderRadius:6,padding:"2px 8px"}}>Probabilité {Math.round(wonItem.p*100)}%</span>
+            <span style={{fontSize:11,fontWeight:700,color:alreadyOwned?"#f39c12":"#27ae60",background:alreadyOwned?"rgba(243,156,18,.12)":"rgba(39,174,96,.12)",border:`1px solid ${alreadyOwned?"rgba(243,156,18,.35)":"rgba(39,174,96,.35)"}`,borderRadius:6,padding:"2px 8px"}}>{alreadyOwned?"Déjà possédé":"Nouveau ! 🎉"}</span>
+          </div>
+          <button onClick={onClose} style={{background:`linear-gradient(135deg,${box.col},${box.col}88)`,color:"#fff",border:"none",borderRadius:12,padding:"11px 26px",cursor:"pointer",fontWeight:700,fontSize:14}}>Super !</button>
         </div>
       )}
       {phase!=="reveal"&&<div style={{color:"rgba(255,255,255,.4)",fontSize:12}}>Bonne chance...</div>}
@@ -310,6 +389,7 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
   const sk=SKINS[skinKey]||SKINS.default;const Ovl=sk.ovl?SK_OVLS[sk.ovl]:null;
   const focusBg=fm?"radial-gradient(ellipse at center,#0a0010,#000)":"transparent";
   return(<div style={{flex:1,display:"flex",flexDirection:"column",position:"relative",overflow:"hidden",background:focusBg,transition:"background .5s"}}>
+    <StreakBorderFlames streak={streak}/>
     {fm&&<Particles/>}
     {showFE&&<FocusEntryPopup onStart={startFocus} onClose={()=>setShowFE(false)} rs={rs} words={words}/>}
     {fDone&&<FocusCompletePopup thresh={ft} onOk={exitFocus}/>}
@@ -376,10 +456,10 @@ function ShopTab({langState,T,onEquip,onOpenBox}){
   const {coins,inventory,equipped}=langState;
   const [lootState,setLootState]=useState(null);
   const rord=["commun","rare","super_rare","epique","legendaire","secret"];
-  function handleBox(box){if(coins<box.cost)return;const item=rollLoot(box);onOpenBox(box.cost,item.id);setLootState({box,item});}
+  function handleBox(box){if(coins<box.cost)return;const item=rollLoot(box);const alreadyOwned=inventory.includes(item.id);onOpenBox(box.cost,item.id);setLootState({box,item,alreadyOwned});}
   const skBoxes=LOOT_BOXES.filter(b=>b.type==="skin");const thBoxes=LOOT_BOXES.filter(b=>b.type==="theme");
   return(<div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
-    {lootState&&<RouletteOpening box={lootState.box} wonItem={lootState.item} onClose={()=>setLootState(null)}/>}
+    {lootState&&<RouletteOpening box={lootState.box} wonItem={lootState.item} alreadyOwned={lootState.alreadyOwned} onClose={()=>setLootState(null)}/>}
     <div style={{padding:"7px 10px",display:"flex",alignItems:"center",gap:4,flexShrink:0,borderBottom:`1px solid ${T.brd}`}}><CoinIcon size={16}/><span style={{color:"#ffd700",fontSize:13,fontWeight:700,marginLeft:2}}>{coins}</span><span style={{color:T.sub,fontSize:11}}> pièces</span></div>
     <div style={{flex:1,overflowY:"auto",padding:"10px 12px"}}>
       {/* COFFRES SKINS */}
@@ -394,7 +474,7 @@ function ShopTab({langState,T,onEquip,onOpenBox}){
       <div style={{height:1,background:T.brd,margin:"4px 0 12px"}}/>
       {/* EQUIPER THEMES */}
       <div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🎨 Thèmes</div>
-      {Object.entries(THEMES).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,th])=>{const id="theme_"+k,owned=th.free||inventory.includes(id),isEq=equipped.theme===k;const rar=RARITY[th.rarity]||RARITY.commun;return(<div key={k} style={{background:`${th.acc}0a`,border:`1px solid ${isEq?th.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${th.bg},${th.surf})`,border:`2px solid ${th.acc}`,flexShrink:0}}/><div style={{flex:1,minWidth:0}}><div style={{color:T.txt,fontWeight:700,fontSize:12}}>{th.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{th.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓</span>:owned?<button onClick={()=>{SFX.nav();onEquip("theme",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
+      {Object.entries(THEMES).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,th])=>{const id="theme_"+k,owned=th.free||inventory.includes(id),isEq=equipped.theme===k;const rar=RARITY[th.rarity]||RARITY.commun;return(<div key={k} style={{background:`${th.acc}0a`,border:`1px solid ${isEq?th.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><ThemeIcon k={k} th={th} size={36}/><div style={{flex:1,minWidth:0}}><div style={{color:T.txt,fontWeight:700,fontSize:12}}>{th.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{th.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓</span>:owned?<button onClick={()=>{SFX.nav();onEquip("theme",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
       <div style={{height:1,background:T.brd,margin:"8px 0 12px"}}/>
       {/* EQUIPER SKINS */}
       <div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🃏 Skins de carte</div>
@@ -403,8 +483,8 @@ function ShopTab({langState,T,onEquip,onOpenBox}){
   </div>);}
 
 // ── PROFILE ───────────────────────────────────────────────────────────────
-function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins}){
-  const [editing,setEditing]=useState(false);const [np,setNp]=useState(state.pseudo||"");const [dbTap,setDbTap]=useState(0);
+function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll}){
+  const [editing,setEditing]=useState(false);const [np,setNp]=useState(state.pseudo||"");const [dbTap,setDbTap]=useState(0);const [showRanks,setShowRanks]=useState(false);
   return(<div style={{height:"100%",display:"flex",flexDirection:"column",background:T.bg,overflowY:"auto"}}>
     <div style={{padding:"10px 12px",background:"rgba(0,0,0,0.4)",borderBottom:`1px solid ${T.brd}`,display:"flex",alignItems:"center",gap:10,flexShrink:0}}><button onClick={onBack} style={{background:"rgba(255,255,255,.07)",border:"none",color:T.txt,borderRadius:8,padding:"4px 9px",cursor:"pointer",fontSize:12}}>← Retour</button><span style={{color:T.txt,fontWeight:800,fontSize:15,flex:1}}>👤 Profil</span></div>
     <div style={{padding:"12px"}}>
@@ -416,11 +496,28 @@ function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins}){
       {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank}=getRankInfo(ls.xp||0);return(<div key={lk} style={{background:"rgba(255,255,255,.04)",border:`1px solid ${T.brd}`,borderRadius:12,padding:"9px 12px",marginBottom:7,display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:20}}>{li.flag}</span><div style={{flex:1}}><div style={{color:T.txt,fontWeight:700,fontSize:13}}>{li.label}</div><div style={{color:T.sub,fontSize:11}}>{m}/{tot} · <CoinIcon size={10}/> {ls.coins}</div></div><RankBadge rank={rank} size={32}/></div>);})}
       <div style={{color:T.txt,fontWeight:800,fontSize:14,margin:"12px 0 8px"}}>🏅 Badges</div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{BADGES.map(b=>{const has=state.badges.includes(b.id);return(<div key={b.id} title={b.l} style={{background:has?"rgba(255,255,255,.08)":"rgba(255,255,255,.03)",border:`1px solid ${has?T.acc:T.brd}`,borderRadius:9,padding:"4px 7px",display:"flex",alignItems:"center",gap:4,opacity:has?1:.3}}><span style={{fontSize:14}}>{b.ic}</span><span style={{color:has?T.txt:T.sub,fontSize:10,fontWeight:has?700:400,maxWidth:60,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{b.l}</span></div>);})}</div>
-      <div style={{marginTop:20}}>
-        <button onClick={debugCoins} style={{width:"100%",background:"linear-gradient(135deg,#f39c12,#e67e22)",border:"none",borderRadius:12,padding:"12px",cursor:"pointer",fontWeight:800,fontSize:14,color:"#fff",boxShadow:"0 4px 14px rgba(243,156,18,0.4)"}}>
-          🪙 +1 000 000 pièces (test)
-        </button>
+      <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{color:T.sub,fontSize:10,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:2}}>🛠 Debug temporaire</div>
+        <button onClick={debugCoins} style={{width:"100%",background:"linear-gradient(135deg,#f39c12,#e67e22)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🪙 +1 000 000 pièces</button>
+        <button onClick={()=>setShowRanks(true)} style={{width:"100%",background:"linear-gradient(135deg,#2980b9,#1a5276)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🏅 Voir tous les rangs</button>
+        <button onClick={onUnlockAll} style={{width:"100%",background:"linear-gradient(135deg,#8e44ad,#6c3483)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🔓 Unlock ALL (skins &amp; thèmes)</button>
       </div>
+      {showRanks&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div style={{background:"linear-gradient(135deg,#0d0d1a,#1a0a2e)",border:`1px solid ${T.brd}`,borderRadius:22,padding:"20px 16px",maxWidth:320,width:"100%",maxHeight:"80vh",overflowY:"auto"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <span style={{color:T.txt,fontWeight:900,fontSize:16}}>🏅 Tous les rangs</span>
+              <button onClick={()=>setShowRanks(false)} style={{background:"rgba(255,255,255,.08)",border:"none",color:T.sub,borderRadius:8,padding:"4px 9px",cursor:"pointer",fontSize:14}}>✕</button>
+            </div>
+            {RANKS.map((r,i)=>(
+              <div key={r.id} style={{display:"flex",alignItems:"center",gap:14,padding:"10px 12px",background:"rgba(255,255,255,.04)",border:`1px solid ${r.col}33`,borderRadius:12,marginBottom:8}}>
+                <RankBadge rank={r} size={52}/>
+                <div><div style={{color:r.col,fontWeight:900,fontSize:15,textShadow:`0 0 8px ${r.col}88`}}>{r.l}</div><div style={{color:T.sub,fontSize:11,marginTop:2}}>{i===0?"Départ":RANK_XP[i].toLocaleString()+" XP"}</div></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   </div>);}
 
@@ -447,10 +544,12 @@ function HomeScreen({state,T,onSelect,onProfile,onLeaderboard}){
     <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center",width:"100%",maxWidth:420}}>
       {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank,xpIn,xpNeed,isMax}=getRankInfo(ls.xp||0);const rPct=isMax?100:Math.min(100,Math.round(xpIn/xpNeed*100));
       return(<button key={lk} onClick={()=>{SFX.nav();onSelect(lk);}} style={{background:"rgba(255,255,255,.05)",border:`1px solid ${T.brd}`,borderRadius:20,padding:"16px 0",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,flex:"1 1 140px",maxWidth:195,transition:"all .2s",position:"relative"}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,.1)";e.currentTarget.style.transform="translateY(-4px)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.05)";e.currentTarget.style.transform="";}}>
-        <span style={{fontSize:38}}>{li.flag}</span>
-        <span style={{color:T.txt,fontSize:14,fontWeight:800}}>{li.label}</span>
-        <RankBadge rank={rank} size={36}/>
-        <span style={{color:rank.col,fontSize:11,fontWeight:700}}>{rank.l}</span>
+        <span style={{fontSize:52,lineHeight:1}}>{li.flag}</span>
+        <span style={{color:T.txt,fontSize:16,fontWeight:900,letterSpacing:-.3}}>{li.label}</span>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,opacity:.8}}>
+          <RankBadge rank={rank} size={22}/>
+          <span style={{color:rank.col,fontSize:9,fontWeight:700,letterSpacing:.5}}>{rank.l}</span>
+        </div>
         <div style={{width:"78%"}}><div style={{display:"flex",gap:1.5,marginBottom:3}}>{Array.from({length:12}).map((_,i)=>{const f=i<Math.round(rPct/100*12);return(<div key={i} style={{flex:1,height:5,borderRadius:1,background:f?rank.col:"rgba(255,255,255,.07)",boxShadow:f?`0 0 3px ${rank.glow}`:"none"}}/>);})}</div><div style={{color:T.sub,fontSize:9,textAlign:"center"}}>{m}/{tot} · {Math.round(m/tot*100)}%</div></div>
         <div style={{position:"absolute",top:7,right:9,display:"flex",alignItems:"center",gap:2}}><CoinIcon size={11}/><span style={{color:"#ffd700",fontSize:9,fontWeight:700}}>{ls.coins||0}</span></div>
       </button>);})}
@@ -508,6 +607,14 @@ export default function App(){
   function handleChangePseudo(p){setState(s=>({...s,pseudo:p}));}
   // DEBUG: add 100k coins to all langs (hidden, triggered by tapping version 5×)
   function debugCoins(){setState(prev=>{const langs={};Object.keys(prev.langs).forEach(lk=>{langs[lk]={...prev.langs[lk],coins:(prev.langs[lk].coins||0)+100000};});return{...prev,langs};});}
+  function handleUnlockAll(){
+    const allSkinIds=Object.keys(SKINS).filter(k=>k!=="default").map(k=>"skin_"+k);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allThemeIds=Object.keys(THEMES).filter(k=>!(THEMES as any)[k].free).map(k=>"theme_"+k);
+    const allItems=[...allSkinIds,...allThemeIds];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setState((prev:any)=>{const langs:any={};Object.keys(prev.langs).forEach((lk:string)=>{const existing=prev.langs[lk].inventory||[];const merged=[...new Set([...existing,...allItems])];langs[lk]={...prev.langs[lk],inventory:merged};});return{...prev,langs};});
+  }
 
   if(screen==="loading"||!appState)return <div style={{height:"100vh",width:"100vw",display:"flex",alignItems:"center",justifyContent:"center",background:"#050510",color:"#fff",fontFamily:"sans-serif"}}>Chargement…</div>;
   
@@ -516,7 +623,7 @@ export default function App(){
   const skinKey=lang?(langState.equipped?.skin||"default"):"default";
 
   if(screen==="setup")return <PseudoSetup T={T} onDone={p=>{setState(s=>({...s,pseudo:p}));setScreen("home");}}/>;
-  if(screen==="profile")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><ProfileScreen state={appState} T={T} onBack={()=>{SFX.nav();setScreen(lang?"lang":"home");}} onChangePseudo={handleChangePseudo} debugCoins={debugCoins}/></div>;
+  if(screen==="profile")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><ProfileScreen state={appState} T={T} onBack={()=>{SFX.nav();setScreen(lang?"lang":"home");}} onChangePseudo={handleChangePseudo} debugCoins={debugCoins} onUnlockAll={handleUnlockAll}/></div>;
   if(screen==="leaderboard")return <div style={{height:"100vh",width:"100vw",overflow:"hidden",background:T.bg}}><LeaderboardScreen T={T} onBack={()=>{SFX.nav();setScreen("home");}} myUUID={appState.uuid}/></div>;
   if(!lang||screen==="home")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><HomeScreen state={appState} T={T} onSelect={lk=>{SFX.nav();setLang(lk);setTab("lessons");setScreen("lang");}} onProfile={()=>{SFX.nav();setScreen("profile");}} onLeaderboard={()=>{SFX.nav();setScreen("leaderboard");}}/></div>;
 
@@ -525,7 +632,7 @@ export default function App(){
   const TABS=[{k:"lessons",l:"📚"},{k:"quiz",l:"🧠"},{k:"quests",l:"🎯"},{k:"shop",l:"🛍"}];
 
   return(<div style={{height:"100vh",width:"100vw",maxWidth:"100vw",display:"flex",flexDirection:"column",overflow:"hidden",background:T.bg,fontFamily:"'Segoe UI',sans-serif"}}>
-    <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}body,html{margin:0;padding:0;overflow:hidden;height:100%;}@keyframes pop{0%{transform:scale(.4)}65%{transform:scale(1.25)}100%{transform:scale(1)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}@keyframes milAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}@keyframes popIn{0%{opacity:0;transform:scale(.5)}70%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}@keyframes flamePulse{from{transform:scale(1)}to{transform:scale(1.1)}}@keyframes holoShift{from{opacity:0.6}to{opacity:1}}@keyframes cursedFlicker{0%,100%{opacity:1}50%{opacity:.7}}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}`}</style>
+    <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}body,html{margin:0;padding:0;overflow:hidden;height:100%;}@keyframes pop{0%{transform:scale(.4)}65%{transform:scale(1.25)}100%{transform:scale(1)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}@keyframes milAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}@keyframes popIn{0%{opacity:0;transform:scale(.5)}70%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}@keyframes flamePulse{from{transform:scale(1)}to{transform:scale(1.1)}}@keyframes flameRise{0%{transform:scaleX(0.82) scaleY(0.86) translateY(3px);opacity:0.6}100%{transform:scaleX(1.14) scaleY(1.1) translateY(-4px);opacity:1}}@keyframes holoShift{from{opacity:0.6}to{opacity:1}}@keyframes cursedFlicker{0%,100%{opacity:1}50%{opacity:.7}}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}`}</style>
     <div style={{padding:"7px 12px",background:"rgba(0,0,0,0.45)",borderBottom:`1px solid ${T.brd}`,flexShrink:0,backdropFilter:"blur(8px)"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
         <button onClick={()=>{SFX.nav();setScreen("home");setLang(null);}} style={{background:"rgba(255,255,255,.06)",border:`1px solid ${T.brd}`,color:"rgba(255,255,255,.5)",borderRadius:7,padding:"3px 8px",cursor:"pointer",fontSize:11,flexShrink:0}}>← Menu</button>
@@ -536,10 +643,10 @@ export default function App(){
       <ProgressHeader ls={langState} T={T}/>
     </div>
     <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
-      {tab==="lessons"&&<LessonsTab words={words} rs={langState.rawScores} langKey={lang} T={T}/>}
-      {tab==="quiz"&&<QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP}/>}
-      {tab==="quests"&&<QuestsTab quests={questsData} questDef={questDef} T={T}/>}
-      {tab==="shop"&&<ShopTab langState={langState} T={T} onEquip={handleEquip} onOpenBox={handleOpenBox}/>}
+      <div style={{display:tab==="lessons"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><LessonsTab words={words} rs={langState.rawScores} langKey={lang} T={T}/></div>
+      <div style={{display:tab==="quiz"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP}/></div>
+      <div style={{display:tab==="quests"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuestsTab quests={questsData} questDef={questDef} T={T}/></div>
+      <div style={{display:tab==="shop"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><ShopTab langState={langState} T={T} onEquip={handleEquip} onOpenBox={handleOpenBox}/></div>
     </div>
     <div style={{display:"flex",borderTop:`1px solid ${T.brd}`,background:"rgba(0,0,0,0.45)",flexShrink:0,backdropFilter:"blur(8px)"}}>{TABS.map(({k,l})=>(<button key={k} onClick={()=>{SFX.nav();setTab(k);}} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:tab===k?T.acc:T.sub,fontWeight:tab===k?700:400,fontSize:18,padding:"11px 0",borderTop:`2px solid ${tab===k?T.acc:"transparent"}`,transition:"all .15s",textShadow:tab===k?`0 0 10px ${T.acc}`:"none"}}>{l}</button>))}</div>
   </div>);}

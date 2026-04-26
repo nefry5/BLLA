@@ -539,6 +539,7 @@ function LeaderboardScreen({T,onBack,myUUID}){
 function HomeScreen({state,T,onSelect,onProfile,onLeaderboard}){
   return(<div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:`linear-gradient(135deg,${T.bg},${T.surf})`,padding:20,fontFamily:"'Segoe UI',sans-serif",position:"relative"}}>
     <div style={{position:"absolute",top:12,right:12,display:"flex",gap:8}}><button onClick={()=>{SFX.nav();onLeaderboard();}} style={{background:"rgba(255,255,255,.07)",border:`1px solid ${T.brd}`,color:T.sub,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:12}}>🏆</button><button onClick={()=>{SFX.nav();onProfile();}} style={{background:"rgba(255,255,255,.07)",border:`1px solid ${T.brd}`,color:T.sub,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:12}}>👤 {state.pseudo}</button></div>
+    <div style={{background:"#4ecdc4",color:"#000",fontSize:11,fontWeight:800,padding:"3px 10px",borderRadius:20,marginBottom:8}}>v2.0 ✓</div>
     <h1 style={{color:T.txt,fontSize:24,margin:"0 0 4px",fontWeight:900,textAlign:"center"}}>🌍 Basic Languages</h1>
     <p style={{color:T.sub,marginBottom:28,textAlign:"center",fontSize:13}}>Maîtrisez les fondamentaux</p>
     <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center",width:"100%",maxWidth:420}}>

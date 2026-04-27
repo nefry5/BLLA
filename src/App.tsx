@@ -104,22 +104,100 @@ const mkL=()=>({xp:0,coins:0,rawScores:{},equipped:{theme:"default",skin:"defaul
 const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},badges:[]};
 
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
-function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><radialGradient id="cg" cx="38%" cy="30%"><stop offset="0%" stopColor="#fffde7"/><stop offset="50%" stopColor="#ffd700"/><stop offset="100%" stopColor="#c77800"/></radialGradient></defs><circle cx="12" cy="12" r="11" fill="url(#cg)" stroke="#c07000" strokeWidth="1.2"/><circle cx="12" cy="12" r="7" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/><text x="12" y="16.5" textAnchor="middle" fontSize="9" fontWeight="900" fill="rgba(120,60,0,0.7)" fontFamily="Arial">$</text></svg>);}
+function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 32 32" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}>
+  <defs><radialGradient id="ciRg" cx="35%" cy="28%"><stop offset="0%" stopColor="#fffde7"/><stop offset="38%" stopColor="#ffd700"/><stop offset="80%" stopColor="#e69000"/><stop offset="100%" stopColor="#b06000"/></radialGradient></defs>
+  <circle cx="16" cy="16.5" r="14.5" fill="#6a3c00" opacity="0.35"/>
+  <circle cx="16" cy="16" r="14" fill="url(#ciRg)" stroke="#b07000" strokeWidth="1"/>
+  <circle cx="16" cy="16" r="11.8" fill="none" stroke="rgba(255,245,80,0.22)" strokeWidth="0.8"/>
+  <polygon points="16,9 17.8,13.6 22.7,13.8 18.9,16.9 20.1,21.7 16,19 11.9,21.7 13.1,16.9 9.3,13.8 14.2,13.6" fill="rgba(110,55,0,0.58)" stroke="rgba(255,210,40,0.42)" strokeWidth="0.5"/>
+  <ellipse cx="10.5" cy="9.5" rx="5" ry="2.8" fill="rgba(255,255,200,0.32)" transform="rotate(-35,10.5,9.5)"/>
+</svg>);}
 
-function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;return(
-  <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0}}>
-    <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient></defs>
-    {r.wings&&<><ellipse cx="9" cy="30" rx="9" ry="5" fill={r.sf} opacity=".75" transform="rotate(-25,9,30)"/><ellipse cx="51" cy="30" rx="9" ry="5" fill={r.sf} opacity=".75" transform="rotate(25,51,30)"/></>}
-    <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={`url(#${gid})`} stroke={r.si} strokeWidth="1.5"/>
-    <path d="M11 9 L49 9 L54 21 L54 38 L30 61 L6 38 L6 21 Z" fill={r.si} opacity="0.55"/>
-    <path d="M14 13 L46 13 L50 23 L50 36 L30 56 L10 36 L10 23 Z" fill={r.sf} opacity="0.2"/>
-    {r.nStars===1&&<text x="30" y="40" textAnchor="middle" fontSize="24" fill={r.ss} fontFamily="Arial">★</text>}
-    {r.nStars===2&&<><text x="21" y="41" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text><text x="39" y="41" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars===3&&<><text x="16" y="43" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text><text x="30" y="38" textAnchor="middle" fontSize="18" fill={r.ss} fontFamily="Arial">★</text><text x="44" y="43" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars>=4&&<text x="30" y="40" textAnchor="middle" fontSize="10" fill={r.ss} fontFamily="Arial" letterSpacing="1">{"★".repeat(r.nStars)}</text>}
-    {r.id==="solar"&&Array.from({length:8}).map((_,i)=>{const a=i*45*Math.PI/180;return <line key={i} x1={30+23*Math.cos(a)} y1={28+23*Math.sin(a)} x2={30+30*Math.cos(a)} y2={28+30*Math.sin(a)} stroke={r.ss} strokeWidth="1.8" opacity=".65"/>;})}
-  </svg>
-);}
+function RankBadge({rank,size=48,opacity=1}){
+  const r=rank,s=size;
+  const gid="rg"+r.id+s,fid="rf"+r.id+s;
+  const gb=({wood:4,bronze:6,silver:7,gold:11,diamond:15,plat:17,solar:22}as Record<string,number>)[r.baseId]||4;
+  const subXs=r.sub===1?[30]:r.sub===2?[23,37]:r.sub===3?[16,30,44]:[];
+  const dots=subXs.map((x:number,i:number)=><circle key={i} cx={x} cy={62} r="3.2" fill={r.ss} stroke="rgba(0,0,0,0.5)" strokeWidth="0.8" opacity="0.9"/>);
+  const G=`url(#${gid})`;
+  let body:JSX.Element;
+  if(r.baseId==="wood"){body=(<g>
+    <path d="M30,5 L52,12 L56,36 L30,58 L4,36 L8,12 Z" fill={r.glow} filter={`url(#${fid})`} opacity="0.5"/>
+    <path d="M30,5 L52,12 L56,36 L30,58 L4,36 L8,12 Z" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <path d="M30,9 L49,15 L52,35 L30,54 L8,35 L11,15 Z" fill="none" stroke={r.ss} strokeWidth="0.7" opacity="0.35"/>
+    <line x1="19" y1="22" x2="41" y2="22" stroke={r.ss} strokeWidth="0.7" opacity="0.3"/>
+    <line x1="17" y1="29" x2="43" y2="29" stroke={r.ss} strokeWidth="0.7" opacity="0.3"/>
+    <line x1="19" y1="36" x2="41" y2="36" stroke={r.ss} strokeWidth="0.7" opacity="0.3"/>
+    <path d="M17,10 Q30,7 43,10 L45,16 Q30,13 15,16 Z" fill="rgba(255,255,255,0.15)"/>
+  </g>);}
+  else if(r.baseId==="bronze"){body=(<g>
+    <circle cx="30" cy="30" r="24" fill={r.glow} filter={`url(#${fid})`} opacity="0.65"/>
+    <circle cx="30" cy="30" r="25" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    {Array.from({length:12}).map((_,i)=>{const a=i*30*Math.PI/180;return(<line key={i} x1={30+21*Math.cos(a)} y1={30+21*Math.sin(a)} x2={30+25.5*Math.cos(a)} y2={30+25.5*Math.sin(a)} stroke={r.ss} strokeWidth="1" opacity="0.55"/>);})}
+    <circle cx="30" cy="30" r="18" fill={r.si} stroke={r.ss} strokeWidth="0.9" opacity="0.75"/>
+    <circle cx="30" cy="30" r="12" fill="none" stroke={r.ss} strokeWidth="1.2" opacity="0.45"/>
+    <circle cx="30" cy="30" r="5.5" fill={r.sf} opacity="0.7"/>
+    <circle cx="30" cy="30" r="2.5" fill="rgba(255,255,255,0.45)"/>
+    <path d="M16,14 Q30,10 44,14" stroke="rgba(255,255,255,0.38)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+  </g>);}
+  else if(r.baseId==="silver"){body=(<g>
+    <polygon points="30,3 52,15 52,45 30,57 8,45 8,15" fill={r.glow} filter={`url(#${fid})`} opacity="0.45"/>
+    <polygon points="30,3 52,15 52,45 30,57 8,45 8,15" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <polygon points="30,9 47,18.5 47,41.5 30,51 13,41.5 13,18.5" fill="none" stroke={r.ss} strokeWidth="0.8" opacity="0.38"/>
+    <line x1="30" y1="3" x2="30" y2="57" stroke="rgba(255,255,255,0.08)" strokeWidth="0.7"/>
+    <line x1="8" y1="15" x2="52" y2="45" stroke="rgba(255,255,255,0.07)" strokeWidth="0.7"/>
+    <line x1="52" y1="15" x2="8" y2="45" stroke="rgba(255,255,255,0.07)" strokeWidth="0.7"/>
+    <path d="M13,16 Q30,10 47,16" stroke="rgba(255,255,255,0.35)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+  </g>);}
+  else if(r.baseId==="gold"){body=(<g>
+    <path d="M6,46 L6,30 L14,36 L22,18 L30,10 L38,18 L46,36 L54,30 L54,46 Z" fill={r.glow} filter={`url(#${fid})`} opacity="0.75"/>
+    <path d="M6,46 L6,30 L14,36 L22,18 L30,10 L38,18 L46,36 L54,30 L54,46 Z" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <rect x="6" y="40" width="48" height="6" rx="1" fill={r.si} stroke={r.sf} strokeWidth="0.8" opacity="0.8"/>
+    <circle cx="30" cy="9.5" r="3.5" fill="#88EEFF" stroke={r.ss} strokeWidth="0.8" opacity="0.9"/>
+    <circle cx="21.5" cy="17.5" r="2.5" fill="#FF88AA" stroke={r.ss} strokeWidth="0.7" opacity="0.85"/>
+    <circle cx="38.5" cy="17.5" r="2.5" fill="#AAFFBB" stroke={r.ss} strokeWidth="0.7" opacity="0.85"/>
+    <rect x="10" y="41.5" width="40" height="3" rx="0.5" fill="rgba(255,255,255,0.12)"/>
+    <path d="M8,31 Q16,26 24,21" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+  </g>);}
+  else if(r.baseId==="diamond"){body=(<g>
+    <polygon points="30,2 54,27 30,58 6,27" fill={r.glow} filter={`url(#${fid})`} opacity="0.7"/>
+    <polygon points="30,2 54,27 30,58 6,27" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <line x1="30" y1="2" x2="30" y2="58" stroke="rgba(255,255,255,0.22)" strokeWidth="0.8"/>
+    <line x1="6" y1="27" x2="54" y2="27" stroke="rgba(255,255,255,0.18)" strokeWidth="0.8"/>
+    <line x1="30" y1="2" x2="6" y2="27" stroke="rgba(255,255,255,0.12)" strokeWidth="0.7"/>
+    <line x1="30" y1="2" x2="54" y2="27" stroke="rgba(255,255,255,0.12)" strokeWidth="0.7"/>
+    <line x1="6" y1="27" x2="30" y2="58" stroke="rgba(255,255,255,0.08)" strokeWidth="0.6"/>
+    <line x1="54" y1="27" x2="30" y2="58" stroke="rgba(255,255,255,0.08)" strokeWidth="0.6"/>
+    <polygon points="30,2 40,14 30,18 20,14" fill="rgba(255,255,255,0.28)"/>
+    <polygon points="30,2 54,27 44,22" fill="rgba(255,255,255,0.1)"/>
+    <polygon points="30,2 6,27 16,22" fill="rgba(255,255,255,0.14)"/>
+  </g>);}
+  else if(r.baseId==="plat"){body=(<g>
+    <polygon points="30,4 34,19 48,11 40,25 55,29 40,33 48,47 34,39 30,54 26,39 12,47 20,33 5,29 20,25 12,11 26,19" fill={r.glow} filter={`url(#${fid})`} opacity="0.7"/>
+    <polygon points="30,4 34,19 48,11 40,25 55,29 40,33 48,47 34,39 30,54 26,39 12,47 20,33 5,29 20,25 12,11 26,19" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <polygon points="30,15 34,25 44,29 34,33 30,43 26,33 16,29 26,25" fill="none" stroke={r.ss} strokeWidth="0.9" opacity="0.5"/>
+    <circle cx="30" cy="29" r="5" fill={r.ss} opacity="0.55"/>
+    <circle cx="30" cy="29" r="2.5" fill="rgba(255,255,255,0.55)"/>
+    <path d="M13,12 Q21,7 30,5" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+  </g>);}
+  else{body=(<g>
+    <circle cx="30" cy="26" r="26" fill={r.glow} filter={`url(#${fid})`} opacity="0.8"/>
+    {Array.from({length:12}).map((_,i)=>{const a=(i*30-90)*Math.PI/180,isLong=i%2===0,r1=22,r2=isLong?33:27;return(<line key={i} x1={30+r1*Math.cos(a)} y1={26+r1*Math.sin(a)} x2={30+r2*Math.cos(a)} y2={26+r2*Math.sin(a)} stroke={r.ss} strokeWidth={isLong?2.5:1.8} strokeLinecap="round" opacity={isLong?0.95:0.75}/>);})}
+    <circle cx="30" cy="26" r="21" fill={G} stroke={r.sf} strokeWidth="1.5"/>
+    <circle cx="30" cy="26" r="15" fill="none" stroke={r.ss} strokeWidth="0.8" opacity="0.4"/>
+    {Array.from({length:6}).map((_,i)=>{const a=(i*60-90)*Math.PI/180;return(<line key={i} x1="30" y1="26" x2={30+13*Math.cos(a)} y2={26+13*Math.sin(a)} stroke={r.ss} strokeWidth="0.7" opacity="0.25"/>);})}
+    <circle cx="30" cy="26" r="7" fill={r.ss} opacity="0.45"/>
+    <circle cx="30" cy="26" r="3" fill="rgba(255,255,255,0.7)"/>
+    <path d="M17,12 Q30,7 43,12" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+  </g>);}
+  return(<svg width={s} height={s*1.1} viewBox="0 0 60 66" style={{opacity,flexShrink:0,overflow:"visible"}}>
+    <defs>
+      <radialGradient id={gid} cx="35%" cy="30%"><stop offset="0%" stopColor={r.ss}/><stop offset="55%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></radialGradient>
+      <filter id={fid} x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur in="SourceGraphic" stdDeviation={gb}/></filter>
+    </defs>
+    {body}{dots}
+  </svg>);
+}
 
 function ChestSVG({level,type,size=56}){const c={wood:{body:"#4a1e08",lid:"#7a3510",band:"#cd7f32",lock:"#e8a050"},gold:{body:"#6b4800",lid:"#aa7700",band:"#ffd700",lock:"#fff59d"},leg:{body:"#1a0030",lid:"#3d0070",band:"#9b00ff",lock:"#cc88ff"}}[level]||{body:"#333",lid:"#555",band:"#888",lock:"#aaa"};const tc=type==="theme"?"#4ecdc4":"#ff9966";return(<svg width={size} height={size} viewBox="0 0 60 60"><rect x="4" y="30" width="52" height="22" rx="4" fill={c.body} stroke={c.band} strokeWidth="1.5"/><path d="M4 20 Q4 12 30 12 Q56 12 56 20 L56 32 L4 32 Z" fill={c.lid} stroke={c.band} strokeWidth="1.5"/><rect x="4" y="30" width="52" height="4" fill={c.band} opacity=".65"/><rect x="25" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="31" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="22" y="33" width="16" height="10" rx="2" fill={c.band}/><circle cx="30" cy="37" r="3" fill={c.lock}/><ellipse cx="18" cy="18" rx="8" ry="3.5" fill="rgba(255,255,255,.18)"/><text x="30" y="27" textAnchor="middle" fontSize="9" fill={tc} fontWeight="900" fontFamily="Arial">{type==="theme"?"DA":"SK"}</text></svg>);}
 

@@ -10,9 +10,12 @@ lootL:()=>{[523,659,784,1047,1319].forEach((f,i)=>tn(f,"sine",.3,.24,i*.07))},
 lootS:()=>{[261,330,523,784,1047].forEach((f,i)=>tn(f,"triangle",.38,.3,i*.09));tn(220,"sawtooth",.2,.12,.45)}
 };
 const getScore=r=>r==null?null:r/10,updateRaw=(r,ok)=>Math.max(0,Math.min(100,(r??0)+(ok?10:-20))),noteCol=s=>s==null?"#444":s<4?"#e74c3c":s<7?"#f39c12":"#27ae60",xpGain=s=>10+Math.floor(Math.min(s,1000)/2),genUUID=()=>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&0x3|0x8)).toString(16);});
-const RANK_XP=[0,1000,4000,10000,20000,35000,60000];
-const RANKS=[{id:"wood",l:"Bois",col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",nStars:1,wings:false},{id:"bronze",l:"Bronze",col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",nStars:2,wings:false},{id:"silver",l:"Argent",col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",nStars:2,wings:false},{id:"gold",l:"Or",col:"#ffd700",glow:"#ffe44d",sf:"#FFD700",si:"#2266AA",ss:"#FFF44D",nStars:3,wings:true},{id:"diamond",l:"Diamant",col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",nStars:4,wings:true},{id:"plat",l:"Platine",col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",nStars:5,wings:true},{id:"solar",l:"Solaire",col:"#ff9800",glow:"#ffcc44",sf:"#FF6600",si:"#AA2200",ss:"#FFE044",nStars:5,wings:true}];
-function getRankInfo(xp){let ri=0;for(let i=RANK_XP.length-1;i>=0;i--){if(xp>=RANK_XP[i]){ri=i;break;}}ri=Math.min(ri,RANKS.length-1);const rank=RANKS[ri],xs=RANK_XP[ri],xn=ri<RANKS.length-1?RANK_XP[ri+1]:null,xIn=xp-xs,xNeed=xn?xn-xs:null,isMax=ri===RANKS.length-1;return{rank,rankIdx:ri,xIn,xNeed,isMax,pct:isMax?100:Math.min(100,Math.round(xIn/xNeed*100)),nextRank:!isMax?RANKS[ri+1]:null};}
+const BASE_RANKS={wood:{col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",wings:false},bronze:{col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",wings:false},silver:{col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",wings:false},gold:{col:"#ffd700",glow:"#ffe44d",sf:"#FFD700",si:"#2266AA",ss:"#FFF44D",wings:true},diamond:{col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",wings:true},plat:{col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",wings:true},solar:{col:"#ff9800",glow:"#ffcc44",sf:"#FF6600",si:"#AA2200",ss:"#FFE044",wings:true}};
+const _rl=(bid,sub,l,cumXP,xpCap)=>({...BASE_RANKS[bid],id:sub===0?bid:bid+sub,baseId:bid,sub,l,cumXP,xpCap,nStars:sub===0?5:sub});
+const RANK_LEVELS=[_rl("wood",1,"Bois I",0,100),_rl("wood",2,"Bois II",100,200),_rl("wood",3,"Bois III",300,300),_rl("bronze",1,"Bronze I",600,400),_rl("bronze",2,"Bronze II",1000,500),_rl("bronze",3,"Bronze III",1500,800),_rl("silver",1,"Argent I",2300,900),_rl("silver",2,"Argent II",3200,1000),_rl("silver",3,"Argent III",4200,1200),_rl("gold",1,"Or I",5400,1400),_rl("gold",2,"Or II",6800,1600),_rl("gold",3,"Or III",8400,2000),_rl("diamond",1,"Diamant I",10400,2500),_rl("diamond",2,"Diamant II",12900,3000),_rl("diamond",3,"Diamant III",15900,5000),_rl("plat",1,"Platine I",20900,10000),_rl("plat",2,"Platine II",30900,15000),_rl("plat",3,"Platine III",45900,25000),_rl("solar",0,"Solaire",70900,Infinity)];
+const RANK_REWARDS={1:{coins:50},2:{coins:75},3:{coins:100},4:{coins:150},5:{coins:200},6:{coins:250},7:{coins:300},8:{coins:350},9:{coins:500},10:{coins:600},11:{coins:700},12:{coins:1000},13:{coins:1200},14:{coins:1500},15:{coins:2000},16:{coins:2500},17:{coins:3000},18:{coins:5000}};
+const CAT_UNLOCK=[0,0,1,1,2,2,3,3,4,5,5,6];
+function getRankInfo(xp){let li=0;for(let i=RANK_LEVELS.length-1;i>=0;i--){if(xp>=RANK_LEVELS[i].cumXP){li=i;break;}}const lv=RANK_LEVELS[li];const xIn=xp-lv.cumXP;const xNeed=lv.xpCap;const isMax=li===RANK_LEVELS.length-1;const pct=isMax?100:Math.min(100,Math.round(xIn/xNeed*100));const rank=lv;const nextRank=!isMax?RANK_LEVELS[li+1]:null;const baseIds=["wood","bronze","silver","gold","diamond","plat","solar"];const rankIdx=baseIds.indexOf(lv.baseId);return{rank,lv,levelIdx:li,rankIdx,xIn,xNeed,isMax,pct,nextRank};}
 const RARITY={commun:{l:"Commun",col:"#9e9e9e"},rare:{l:"Rare",col:"#4caf50"},super_rare:{l:"Super Rare",col:"#2196f3"},epique:{l:"Épique",col:"#9c27b0"},legendaire:{l:"Légendaire",col:"#ff9800"},secret:{l:"Secret",col:"#ff2222"}};
 const THEMES={default:{bg:"#050510",surf:"#0d1117",card:"#1a1f3a",acc:"#4ecdc4",txt:"#fff",sub:"#777",brd:"rgba(255,255,255,.07)",label:"Espace Sombre",rarity:"commun",free:true},zen:{bg:"#020e05",surf:"#041508",card:"#0a2210",acc:"#52e07c",txt:"#e8ffe0",sub:"#6b9",brd:"rgba(82,224,124,.1)",label:"Forêt Zen",rarity:"commun"},arctic:{bg:"#000d1a",surf:"#001a2e",card:"#002244",acc:"#88ddff",txt:"#e0f4ff",sub:"#7bb",brd:"rgba(136,221,255,.1)",label:"Arctic Frost",rarity:"commun"},sakura:{bg:"#120009",surf:"#1e000f",card:"#2e0018",acc:"#ff80ab",txt:"#ffe0f0",sub:"#d9a",brd:"rgba(255,128,171,.1)",label:"Sakura Nuit",rarity:"commun"},desert:{bg:"#140a00",surf:"#1e1200",card:"#2a1800",acc:"#d4a050",txt:"#f5e0b0",sub:"#a85",brd:"rgba(212,160,80,.12)",label:"Désert Antique",rarity:"commun"},abyss:{bg:"#000a12",surf:"#001525",card:"#002035",acc:"#00bcd4",txt:"#e0f7fa",sub:"#5bc",brd:"rgba(0,188,212,.1)",label:"Océan Abyssal",rarity:"rare"},pixel:{bg:"#000511",surf:"#000a1e",card:"#001133",acc:"#ff4466",txt:"#ddeeff",sub:"#8ac",brd:"rgba(255,68,102,.12)",label:"Pixel Rétro",rarity:"rare"},jungle:{bg:"#020810",surf:"#040f18",card:"#061a20",acc:"#39ff14",txt:"#e0ffe0",sub:"#5a8",brd:"rgba(57,255,20,.1)",label:"Jungle Néon",rarity:"rare"},volcano:{bg:"#0d0000",surf:"#1a0000",card:"#250500",acc:"#ff4400",txt:"#ffe0d0",sub:"#c76",brd:"rgba(255,68,0,.12)",label:"Volcan",rarity:"rare"},steam:{bg:"#100c08",surf:"#1a1408",card:"#261c10",acc:"#c8922a",txt:"#f5e8c0",sub:"#b98",brd:"rgba(200,146,42,.12)",label:"Steampunk",rarity:"rare"},cyber:{bg:"#0a0015",surf:"#100020",card:"#1a0035",acc:"#ff00cc",txt:"#fff",sub:"#bb8",brd:"rgba(255,0,204,.12)",label:"Cyberpunk 2099",rarity:"super_rare"},scriptorium:{bg:"#0d0800",surf:"#180d00",card:"#221200",acc:"#c8a840",txt:"#f5e0b0",sub:"#a88",brd:"rgba(200,168,64,.12)",label:"Scriptorium",rarity:"super_rare"},cosmos:{bg:"#050010",surf:"#0a0020",card:"#0f0030",acc:"#cc88ff",txt:"#f0e0ff",sub:"#99a",brd:"rgba(204,136,255,.1)",label:"Cosmos",rarity:"super_rare"},spectre:{bg:"#080018",surf:"#100025",card:"#180035",acc:"#7700ff",txt:"#f0e0ff",sub:"#9a7",brd:"rgba(119,0,255,.12)",label:"Spectre Violet",rarity:"super_rare"},royal:{bg:"#060600",surf:"#0d0d00",card:"#141400",acc:"#ffd700",txt:"#fff8e0",sub:"#cc9",brd:"rgba(255,215,0,.12)",label:"Royal Gold",rarity:"epique"},bloodmoon:{bg:"#0d0000",surf:"#1a0000",card:"#280000",acc:"#ff3030",txt:"#ffe0e0",sub:"#d77",brd:"rgba(255,48,48,.12)",label:"Blood Moon",rarity:"epique"},arcane:{bg:"#001414",surf:"#001e1e",card:"#002828",acc:"#00e5ff",txt:"#e0ffff",sub:"#5cc",brd:"rgba(0,229,255,.1)",label:"Cristal Arcanique",rarity:"epique"},void_th:{bg:"#000000",surf:"#050005",card:"#0a000f",acc:"#aa00ff",txt:"#f0e0ff",sub:"#a7c",brd:"rgba(170,0,255,.12)",label:"Void Éternel",rarity:"legendaire"},prism:{bg:"#050010",surf:"#0a0018",card:"#0f0025",acc:"#ffffff",txt:"#fff",sub:"#aaa",brd:"rgba(255,255,255,.15)",label:"Dimension Prismatique",rarity:"legendaire"},nexus:{bg:"#000000",surf:"#000000",card:"#050005",acc:"#ff0000",txt:"#ff8888",sub:"#555",brd:"rgba(255,0,0,.2)",label:"??? Nexus Quantique",rarity:"secret"}};
 
@@ -71,7 +74,11 @@ const LOOT_BOXES=[
 function rollLoot(box){const r=Math.random();let c=0;for(const it of box.pool){c+=it.p;if(r<=c)return it;}return box.pool[box.pool.length-1];}
 
 const Q_POOL=[{id:"c20",t:"cards",n:20,label:"Retourne 20 cartes",xp:50,coins:30},{id:"c50",t:"cards",n:50,label:"Retourne 50 cartes",xp:100,coins:80},{id:"c100",t:"cards",n:100,label:"Retourne 100 cartes",xp:200,coins:150},{id:"s10",t:"streak",n:10,label:"Streak de 10",xp:80,coins:60},{id:"s20",t:"streak",n:20,label:"Streak de 20",xp:150,coins:120},{id:"s30",t:"streak",n:30,label:"Streak de 30",xp:250,coins:200},{id:"m1",t:"master",n:1,label:"Maîtrise 1 mot",xp:60,coins:50},{id:"m3",t:"master",n:3,label:"Maîtrise 3 mots",xp:150,coins:120},{id:"x100",t:"xp",n:100,label:"Gagne 100 XP",xp:30,coins:40},{id:"x200",t:"xp",n:200,label:"Gagne 200 XP",xp:60,coins:80}];
+const WEEKLY_Q_POOL=[{id:"wc200",t:"cards",n:200,label:"Retourne 200 cartes",xp:200,coins:300},{id:"wc500",t:"cards",n:500,label:"Retourne 500 cartes",xp:500,coins:600},{id:"ws50",t:"streak",n:50,label:"Streak de 50",xp:300,coins:400},{id:"ws100",t:"streak",n:100,label:"Streak de 100",xp:600,coins:800},{id:"wm5",t:"master",n:5,label:"Maîtrise 5 mots",xp:250,coins:350},{id:"wm10",t:"master",n:10,label:"Maîtrise 10 mots",xp:500,coins:700},{id:"wx500",t:"xp",n:500,label:"Gagne 500 XP",xp:150,coins:200},{id:"wx1000",t:"xp",n:1000,label:"Gagne 1000 XP",xp:300,coins:400}];
 const todayStr=()=>new Date().toISOString().split("T")[0];
+const weekStr=()=>{const d=new Date();const jan1=new Date(d.getFullYear(),0,1);const wk=Math.ceil(((d.getTime()-jan1.getTime())/86400000+jan1.getDay()+1)/7);return`${d.getFullYear()}-W${String(wk).padStart(2,"0")}`;};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getWeeklyQuests(ws:string,lk:string):any[]{let s=(ws+lk).split("").reduce((a,c,i)=>a+(c.charCodeAt(0)*(i+1)),0);const p:typeof WEEKLY_Q_POOL=[];const pu:number[]=[];while(p.length<2){s=(s*1664525+1013904223)>>>0;const i=s%WEEKLY_Q_POOL.length;if(!pu.includes(i)){pu.push(i);p.push(WEEKLY_Q_POOL[i]);}}return p;}
 function getDailyQuests(ds){let s=ds.split("-").reduce((a,b,i)=>a+(parseInt(b)*(i===0?10000:i===1?100:1)),0);const p=[],u=new Set();while(p.length<3){s=(s*1664525+1013904223)>>>0;const i=s%Q_POOL.length;if(!u.has(i)){u.add(i);p.push(Q_POOL[i]);}}return p;}
 const BADGES=[{id:"b_fw",ic:"⭐",l:"1er mot maîtrisé"},{id:"b_s10",ic:"🔥",l:"Streak 10"},{id:"b_s50",ic:"💥",l:"Streak 50"},{id:"b_s100",ic:"⚡",l:"Streak 100"},{id:"b_m10",ic:"📚",l:"10 mots"},{id:"b_m50",ic:"🎓",l:"50 mots"},{id:"b_m100",ic:"👑",l:"100 mots"},{id:"b_rbr",ic:"🥉",l:"Rang Bronze"},{id:"b_rgo",ic:"🥇",l:"Rang Or"},{id:"b_rpl",ic:"🔮",l:"Rang Platine"},{id:"b_rso",ic:"☀️",l:"Rang Solaire"},{id:"b_pen",ic:"🏆",l:"Platine EN"},{id:"b_pde",ic:"🏆",l:"Platine DE"},{id:"b_pes",ic:"🏆",l:"Platine ES"},{id:"b_pit",ic:"🏆",l:"Platine IT"}];
 const CAT_ICONS=["⚡","👪","🫀","🍎","🌿","🏠","💭","⏰","🌍","💡","🎨","🌀"],CAT_NAMES=["Actions","Famille","Corps","Nourriture","Nature","Maison","Émotions","Temps","Société","Concepts","Couleurs","Divers"];
@@ -93,7 +100,7 @@ const WORDS={en:dedup(pw(EN_RAW)),de:dedup(pw(DE_RAW)),es:dedup(pw(ES_RAW)),it:d
 const LANG_INFO={en:{flag:"🇬🇧",label:"Anglais"},de:{flag:"🇩🇪",label:"Allemand"},es:{flag:"🇪🇸",label:"Espagnol"},it:{flag:"🇮🇹",label:"Italien"}};
 function weightedPick(pool,rs,ex){const src=ex&&pool.length>1?pool.filter(([w])=>w!==ex):pool;const wts=src.map(([w])=>{const r=rs[w];return r==null?120:Math.max(4,104-r);});const tot=wts.reduce((a,b)=>a+b,0);let r=Math.random()*tot;for(let i=0;i<src.length;i++){r-=wts[i];if(r<=0)return src[i];}return src[src.length-1];}
 const SK="blang_v7";
-const mkL=()=>({xp:0,coins:0,rawScores:{},equipped:{theme:"default",skin:"default"},inventory:[],quests:{date:"",progress:{},done:[]}});
+const mkL=()=>({xp:0,coins:0,rawScores:{},equipped:{theme:"default",skin:"default"},inventory:[],quests:{date:"",progress:{},done:[]},weeklyQuests:{week:"",progress:{},done:[]}});
 const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},badges:[]};
 
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
@@ -307,7 +314,7 @@ function FocusEntryPopup({onStart,onClose,rs,words}){const [thresh,setThresh]=us
 function FocusCompletePopup({thresh,onOk}){return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,padding:20}}><div style={{background:"linear-gradient(135deg,#0a0010,#1a0020)",border:"2px solid #27ae60",borderRadius:22,padding:"28px 20px",maxWidth:270,width:"100%",textAlign:"center",boxShadow:"0 0 40px #27ae6055"}}><div style={{fontSize:44,marginBottom:8}}>✨</div><div style={{color:"#27ae60",fontWeight:900,fontSize:17,marginBottom:8}}>Objectif atteint !</div><div style={{color:"rgba(255,255,255,.6)",fontSize:13,lineHeight:1.6,marginBottom:20}}>Il n'y a plus de mot en dessous de <span style={{color:"#27ae60",fontWeight:700}}>{thresh}.0/10</span> !</div><button onClick={onOk} style={{background:"linear-gradient(135deg,#27ae60,#1e8449)",color:"#fff",border:"none",borderRadius:11,padding:"11px 28px",cursor:"pointer",fontWeight:700,fontSize:13}}>OK ✓</button></div></div>);}
 
 // ── LESSONS ───────────────────────────────────────────────────────────────
-function LessonsTab({words,rs,langKey,T}){
+function LessonsTab({words,rs,langKey,T,levelIdx=0}){
   const [openCat,setOpenCat]=useState(null);const catFn=CAT_FNS[langKey];
   const mastered=words.filter(([w])=>(rs[w]??-1)>=70).length;
   const groups=useMemo(()=>{const g={};words.forEach(([w,fr])=>{const ci=catFn(w);if(!g[ci])g[ci]=[];g[ci].push([w,fr]);});Object.values(g).forEach(arr=>arr.sort((a,b)=>{const ra=rs[a[0]],rb=rs[b[0]];const ha=ra!=null,hb=rb!=null;if(!ha&&!hb)return 0;if(!ha)return 1;if(!hb)return -1;return ra-rb;}));return g;},[words,rs]);
@@ -320,17 +327,19 @@ function LessonsTab({words,rs,langKey,T}){
     <div style={{overflowY:"auto",flex:1,padding:"8px 10px"}}>
       {catOrder.map(ci=>{
         const w2=groups[ci];if(!w2)return null;
+        const reqLvl=CAT_UNLOCK[ci]??0;const isLocked=levelIdx<reqLvl;
         const scored=w2.filter(([w])=>rs[w]!=null);
         const avgRaw=scored.length?scored.reduce((s,[w])=>s+rs[w],0)/scored.length:null;
         const avgSc=avgRaw!=null?Math.round(avgRaw/10*10)/10:null;
         const done=w2.filter(([w])=>(rs[w]??-1)>=70).length;
-        const isOpen=openCat===ci;const c=noteCol(avgSc);
+        const isOpen=openCat===ci&&!isLocked;const c=isLocked?"rgba(255,255,255,.15)":noteCol(avgSc);
+        const unlockLv=RANK_LEVELS[reqLvl];
         return(<div key={ci} style={{marginBottom:6}}>
-          <button onClick={()=>{SFX.nav();setOpenCat(isOpen?null:ci);}} style={{width:"100%",background:"rgba(255,255,255,0.04)",border:`1px solid ${T.brd}`,borderRadius:12,padding:"10px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
-            <span style={{fontSize:20,flexShrink:0,lineHeight:1}}>{CAT_ICONS[ci]||"🌀"}</span>
-            <div style={{flex:1}}><div style={{color:T.txt,fontSize:13,fontWeight:700}}>{CAT_NAMES[ci]||"Divers"}</div><div style={{color:T.sub,fontSize:11}}>{done}/{w2.length} maîtrisés</div></div>
-            <div style={{width:34,height:34,borderRadius:"50%",border:`2px solid ${c}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,background:`${c}11`}}><span style={{color:c,fontSize:9,fontWeight:800,lineHeight:1}}>{avgSc!==null?avgSc.toFixed(1):"–"}</span><span style={{color:c,fontSize:7,lineHeight:1,opacity:.7}}>/10</span></div>
-            <span style={{color:T.sub,fontSize:12}}>{isOpen?"▲":"▼"}</span>
+          <button onClick={()=>{if(!isLocked){SFX.nav();setOpenCat(isOpen?null:ci);}}} style={{width:"100%",background:isLocked?"rgba(255,255,255,0.02)":"rgba(255,255,255,0.04)",border:`1px solid ${isLocked?"rgba(255,255,255,.05)":T.brd}`,borderRadius:12,padding:"10px 12px",cursor:isLocked?"default":"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left",opacity:isLocked?.45:1}}>
+            <span style={{fontSize:20,flexShrink:0,lineHeight:1}}>{isLocked?"🔒":CAT_ICONS[ci]||"🌀"}</span>
+            <div style={{flex:1}}><div style={{color:T.txt,fontSize:13,fontWeight:700}}>{CAT_NAMES[ci]||"Divers"}</div><div style={{color:T.sub,fontSize:11}}>{isLocked?`Débloqué au rang ${unlockLv?.l||"?"}`:`${done}/${w2.length} maîtrisés`}</div></div>
+            {!isLocked&&<div style={{width:34,height:34,borderRadius:"50%",border:`2px solid ${c}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,background:`${c}11`}}><span style={{color:c,fontSize:9,fontWeight:800,lineHeight:1}}>{avgSc!==null?avgSc.toFixed(1):"–"}</span><span style={{color:c,fontSize:7,lineHeight:1,opacity:.7}}>/10</span></div>}
+            {!isLocked&&<span style={{color:T.sub,fontSize:12}}>{isOpen?"▲":"▼"}</span>}
           </button>
           {isOpen&&<div style={{marginTop:3}}>{w2.map(([w,fr])=>{const raw=rs[w],sc=getScore(raw),c2=noteCol(sc),ip=raw===100;return(<div key={w} style={{background:ip?"rgba(39,174,96,0.07)":"rgba(255,255,255,0.025)",borderRadius:9,padding:"8px 10px",marginBottom:4,display:"flex",alignItems:"center",gap:8,border:`1px solid ${ip?"rgba(39,174,96,0.2)":T.brd}`}}><div style={{width:30,height:30,borderRadius:"50%",border:`2px solid ${c2}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,background:`${c2}11`}}><span style={{color:c2,fontSize:8,fontWeight:800,lineHeight:1}}>{sc!==null?sc.toFixed(1):"–"}</span><span style={{color:c2,fontSize:7,lineHeight:1,opacity:.7}}>/10</span></div><span style={{color:T.txt,fontWeight:700,fontSize:13,flexShrink:0}}>{w.charAt(0).toUpperCase()+w.slice(1)}</span><span style={{color:"rgba(255,255,255,.18)",fontSize:12,flexShrink:0}}>🔄</span><span style={{color:T.sub,fontSize:12,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fr}</span>{ip&&<span style={{flexShrink:0,fontSize:11}}>⭐</span>}</div>);})}</div>}
         </div>);
@@ -339,7 +348,7 @@ function LessonsTab({words,rs,langKey,T}){
   </div>);}
 
 // ── QUIZ ──────────────────────────────────────────────────────────────────
-function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
+function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,curXp=0}){
   const [fm,setFm]=useState(false);const [ft,setFt]=useState(null);const [showFE,setShowFE]=useState(false);const [fDone,setFDone]=useState(false);
   const [streak,setStreak]=useState(0);const [sessionCards,setSessionCards]=useState(0);const [curWord,setCurWord]=useState(null);const [rev,setRev]=useState(false);
   const [flipped,setFlipped]=useState(false);const [locked,setLocked]=useState(false);
@@ -347,8 +356,9 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
   const [milestone,setMilestone]=useState(null);const [rankUp,setRankUp]=useState(null);
   const [xpAnim,setXpAnim]=useState(null);const [coinAnim,setCoinAnim]=useState(null);
   const touchX=useRef(null);const latRs=useRef(rs);useEffect(()=>{latRs.current=rs;},[rs]);
-  const prevRankIdx=useRef(getRankInfo(0).rankIdx);
-  const latXp=useRef(0);
+  const prevActive=useRef(isActive);
+  const latXp=useRef(curXp);useEffect(()=>{latXp.current=curXp;},[curXp]);
+  useEffect(()=>{if(!isActive&&prevActive.current){setStreak(0);setSessionCards(0);}prevActive.current=isActive;},[isActive]);
 
   const getPool=useCallback((cRs,cFm,cFt)=>{if(!cFm||cFt===null)return words;return words.filter(([w])=>{const r=cRs[w];return r!==undefined&&r!==null&&r<cFt*10;});},[words]);
   function pick(ex,cRs=latRs.current,cFm=fm,cFt=ft){const pool=getPool(cRs,cFm,cFt);if(!pool.length){if(cFm)setFDone(true);return;}setCurWord(weightedPick(pool,cRs,ex));setRev(Math.random()<.5);setFlipped(false);setLocked(false);}
@@ -366,19 +376,19 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
     const ns=correct?streak+1:0;setStreak(ns);const nc=sessionCards+1;setSessionCards(nc);
     const base=10,bonus=correct?Math.floor(Math.min(ns,1000)/2):0,earned=correct?base+bonus:0;
     if(correct&&MILESTONES.includes(ns))setMilestone(ns);
-    const oldRaw=latRs.current[curWord[0]]??0;const newRaw=updateRaw(oldRaw,correct);const jp=newRaw===100&&oldRaw!==100;
+    const oldRaw=latRs.current[curWord[0]]??0;const newRaw=updateRaw(oldRaw,correct);const jp=newRaw===100&&oldRaw!==100;const jm=newRaw>=70&&oldRaw<70;
     if(jp){SFX.perfect();setShowPerfect(true);setTimeout(()=>setShowPerfect(false),1300);}
     if(correct){setXpAnim({base,bonus});setTimeout(()=>setXpAnim(null),900);}
     setCoinAnim("+"+nc);setTimeout(()=>setCoinAnim(null),700);
-    // Rank-up detection: compare BEFORE and AFTER score update
+    // Rank-up detection: compare levelIdx BEFORE and AFTER score update
     const newXp=latXp.current+earned;
-    const oldRi=getRankInfo(latXp.current).rankIdx;
-    const newRi=getRankInfo(newXp).rankIdx;
+    const oldLi=getRankInfo(latXp.current).levelIdx;
     latXp.current=newXp;
-    if(newRi>oldRi)setRankUp(RANKS[newRi]);
+    const newRankInfo=getRankInfo(newXp);
+    if(newRankInfo.levelIdx>oldLi)setRankUp(newRankInfo.rank);
     // Badges: streak
     onScore(curWord[0],correct,earned,nc,ns,jp);
-    onQP({cardFlipped:1,streak:ns,xpEarned:earned,mastered:jp?1:0});
+    onQP({cardFlipped:1,streak:ns,xpEarned:earned,mastered:jm?1:0});
     setTimeout(()=>{
       const upRs={...latRs.current,[curWord[0]]:newRaw};
       if(words.every(([w])=>(upRs[w]??-1)>=100)){setShowPlat(true);return;}
@@ -400,10 +410,10 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
     <div style={{flex:1,display:"flex",flexDirection:"column",padding:"8px 12px",gap:8,position:"relative",zIndex:1}}>
       {/* Top bar */}
       <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-        {fm?<button onClick={exitFocus} style={{background:"rgba(155,89,182,.2)",color:"#9b59b6",border:"1px solid #9b59b6",borderRadius:16,padding:"4px 10px",fontSize:11,cursor:"pointer",fontWeight:700}}>✕ Focus</button>:<button onClick={()=>setShowFE(true)} style={{background:"linear-gradient(135deg,rgba(155,89,182,.2),rgba(100,0,80,.2))",color:"#9b59b6",border:"1px solid rgba(155,89,182,.4)",borderRadius:16,padding:"4px 10px",fontSize:11,cursor:"pointer",fontWeight:700}}>🎯 Focus</button>}
+        {fm?<button onClick={exitFocus} style={{background:"rgba(155,89,182,.2)",color:"#9b59b6",border:"1px solid #9b59b6",borderRadius:16,padding:"4px 10px",fontSize:11,cursor:"pointer",fontWeight:700}}>✕ Focus</button>:(()=>{const disc=words.filter(([w])=>rs[w]!=null).length;const canFocus=disc>=50;return(<button onClick={()=>{if(canFocus)setShowFE(true);}} title={canFocus?"":"Découvre 50 mots pour débloquer le mode Focus"} style={{background:canFocus?"linear-gradient(135deg,rgba(155,89,182,.2),rgba(100,0,80,.2))":"rgba(255,255,255,.04)",color:canFocus?"#9b59b6":"rgba(255,255,255,.2)",border:`1px solid ${canFocus?"rgba(155,89,182,.4)":"rgba(255,255,255,.1)"}`,borderRadius:16,padding:"4px 10px",fontSize:11,cursor:canFocus?"pointer":"default",fontWeight:700}}>{canFocus?"🎯 Focus":`🔒 Focus (${disc}/50)`}</button>);})()}
         {fm&&ft&&<span style={{background:"rgba(155,89,182,.12)",border:"1px solid rgba(155,89,182,.25)",borderRadius:8,padding:"2px 7px",color:"#9b59b6",fontSize:10,fontWeight:600}}>{"<"}{ft}.0</span>}
         <div style={{marginLeft:"auto",position:"relative",display:"flex",alignItems:"center"}}>
-          {xpAnim&&<div style={{position:"absolute",right:"100%",top:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:1,pointerEvents:"none",marginRight:6}}><span style={{color:"#4ecdc4",fontSize:11,fontWeight:800,animation:"floatUp .8s ease forwards"}}>+{xpAnim.base} XP</span>{xpAnim.bonus>0&&<span style={{color:"#ff9800",fontSize:11,fontWeight:800,animation:"floatUp .8s ease .1s forwards"}}>+{xpAnim.bonus}🔥</span>}</div>}
+          {xpAnim&&<div style={{position:"absolute",right:"100%",top:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:1,pointerEvents:"none",marginRight:6}}><span style={{color:"#4ecdc4",fontSize:11,fontWeight:800,animation:"floatUp .8s ease forwards"}}>+{xpAnim.base} XP</span>{xpAnim.bonus>0&&<span style={{color:"#ff9800",fontSize:11,fontWeight:800,animation:"floatUp .8s ease .1s forwards"}}>+{xpAnim.bonus} XP 🔥</span>}</div>}
           <Flame streak={streak}/>
         </div>
       </div>
@@ -423,9 +433,9 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
               {Ovl&&<div style={{position:"absolute",inset:0,borderRadius:18,overflow:"hidden",pointerEvents:"none"}}><Ovl/></div>}
               <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:8}}><span style={{fontSize:28}}>{qFlag}</span><span style={{color:sk.tc,fontSize:26,fontWeight:800,textAlign:"center",lineHeight:1.2,textShadow:sk.tc==="#3d2b0e"||sk.tc==="#3a2a1a"?"none":"0 1px 4px rgba(0,0,0,0.5)"}}>{question}</span><span style={{color:sk.tc,fontSize:10,opacity:.35}}>↻ Retourner</span></div>
             </div>
-            {/* Back */}
-            <div style={{position:"absolute",inset:0,backfaceVisibility:"hidden",WebkitBackfaceVisibility:"hidden",transform:"rotateY(180deg)",borderRadius:18,background:"linear-gradient(135deg,#0d2818,#071510)",boxShadow:"0 8px 28px rgba(0,0,0,.6)",border:"1px solid rgba(39,174,96,.15)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:20}}>
-              <span style={{fontSize:28}}>{aFlag}</span><span style={{color:"#fff",fontSize:22,fontWeight:700,textAlign:"center",lineHeight:1.2}}>{answer}</span>
+            {/* Back — same skin as front */}
+            <div style={{position:"absolute",inset:0,backfaceVisibility:"hidden",WebkitBackfaceVisibility:"hidden",transform:"rotateY(180deg)",borderRadius:18,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,boxShadow:"0 8px 28px rgba(0,0,0,.6)",border:`1.5px solid ${sk.brd}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:20,isolation:"isolate"}}>
+              <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:8}}><span style={{fontSize:28}}>{aFlag}</span><span style={{color:sk.tc,fontSize:22,fontWeight:700,textAlign:"center",lineHeight:1.2,textShadow:sk.tc==="#3d2b0e"||sk.tc==="#3a2a1a"?"none":"0 1px 4px rgba(0,0,0,0.5)"}}>{answer}</span></div>
             </div>
           </div>
         </div>
@@ -443,12 +453,18 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP}){
   </div>);}
 
 // ── QUESTS ────────────────────────────────────────────────────────────────
-function QuestsTab({quests,questDef,T}){
+function QuestCard({q,prog,done,T,accentColor="#27ae60"}){const p=prog[q.id]||0,isDone=done.includes(q.id),pct=Math.min(100,Math.round(p/q.n*100));return(<div style={{background:isDone?"rgba(39,174,96,0.07)":"rgba(255,255,255,0.04)",border:`1px solid ${isDone?"rgba(39,174,96,0.25)":T.brd}`,borderRadius:14,padding:"13px",marginBottom:9,opacity:isDone?.75:1}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><div style={{flex:1}}><div style={{color:T.txt,fontWeight:700,fontSize:13}}>{q.label}</div><div style={{display:"flex",alignItems:"center",gap:4,marginTop:2}}><span style={{color:T.acc,fontSize:11}}>+{q.xp} XP</span><span style={{color:T.sub,fontSize:10}}>·</span><CoinIcon size={10}/><span style={{color:"#ffd700",fontSize:11}}>+{q.coins}</span></div></div>{isDone?<span style={{fontSize:18}}>✅</span>:<span style={{color:T.acc,fontWeight:800,fontSize:12}}>{p}/{q.n}</span>}</div><div style={{background:"rgba(255,255,255,0.07)",borderRadius:5,height:5}}><div style={{width:`${pct}%`,background:isDone?accentColor:`linear-gradient(90deg,${T.acc},${T.acc}88)`,borderRadius:5,height:5,transition:"width .4s"}}/></div></div>);}
+function QuestsTab({quests,questDef,weeklyQuests,weeklyQuestDef,T}){
   const today=todayStr();const isToday=quests.date===today;
-  const prog=isToday?quests.progress||{}:{};const done=isToday?quests.done||[]:[]; 
+  const prog=isToday?quests.progress||{}:{};const done=isToday?quests.done||[]:[];
+  const ws=weekStr();const isThisWeek=weeklyQuests?.week===ws;
+  const wprog=isThisWeek?weeklyQuests.progress||{}:{};const wdone=isThisWeek?weeklyQuests.done||[]:[];
   return(<div style={{flex:1,overflowY:"auto",padding:"12px"}}>
     <div style={{marginBottom:12}}><div style={{color:T.txt,fontWeight:800,fontSize:16,marginBottom:2}}>🎯 Quêtes du jour</div><div style={{color:T.sub,fontSize:11}}>Se renouvellent à minuit</div></div>
-    {questDef.map(q=>{const p=prog[q.id]||0,isDone=done.includes(q.id),pct=Math.min(100,Math.round(p/q.n*100));return(<div key={q.id} style={{background:isDone?"rgba(39,174,96,0.07)":"rgba(255,255,255,0.04)",border:`1px solid ${isDone?"rgba(39,174,96,0.25)":T.brd}`,borderRadius:14,padding:"13px",marginBottom:9,opacity:isDone?.75:1}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><div style={{flex:1}}><div style={{color:T.txt,fontWeight:700,fontSize:13}}>{q.label}</div><div style={{display:"flex",alignItems:"center",gap:4,marginTop:2}}><span style={{color:T.acc,fontSize:11}}>+{q.xp} XP</span><span style={{color:T.sub,fontSize:10}}>·</span><CoinIcon size={10}/><span style={{color:"#ffd700",fontSize:11}}>+{q.coins}</span></div></div>{isDone?<span style={{fontSize:18}}>✅</span>:<span style={{color:T.acc,fontWeight:800,fontSize:12}}>{p}/{q.n}</span>}</div><div style={{background:"rgba(255,255,255,0.07)",borderRadius:5,height:5}}><div style={{width:`${pct}%`,background:isDone?"#27ae60":`linear-gradient(90deg,${T.acc},${T.acc}88)`,borderRadius:5,height:5,transition:"width .4s"}}/></div></div>);})}
+    {questDef.map(q=><QuestCard key={q.id} q={q} prog={prog} done={done} T={T}/>)}
+    <div style={{height:1,background:T.brd,margin:"16px 0 12px"}}/>
+    <div style={{marginBottom:12}}><div style={{color:T.txt,fontWeight:800,fontSize:16,marginBottom:2}}>📅 Quêtes de la semaine</div><div style={{color:T.sub,fontSize:11}}>Se renouvellent chaque lundi · Plus difficiles, plus récompensantes</div></div>
+    {(weeklyQuestDef||[]).map(q=><QuestCard key={q.id} q={q} prog={wprog} done={wdone} T={T} accentColor="#f39c12"/>)}
   </div>);}
 
 // ── SHOP ──────────────────────────────────────────────────────────────────
@@ -483,7 +499,7 @@ function ShopTab({langState,T,onEquip,onOpenBox}){
   </div>);}
 
 // ── PROFILE ───────────────────────────────────────────────────────────────
-function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll}){
+function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll,onResetLang,onMasterAll,currentLang}){
   const [editing,setEditing]=useState(false);const [np,setNp]=useState(state.pseudo||"");const [dbTap,setDbTap]=useState(0);const [showRanks,setShowRanks]=useState(false);
   return(<div style={{height:"100%",display:"flex",flexDirection:"column",background:T.bg,overflowY:"auto"}}>
     <div style={{padding:"10px 12px",background:"rgba(0,0,0,0.4)",borderBottom:`1px solid ${T.brd}`,display:"flex",alignItems:"center",gap:10,flexShrink:0}}><button onClick={onBack} style={{background:"rgba(255,255,255,.07)",border:"none",color:T.txt,borderRadius:8,padding:"4px 9px",cursor:"pointer",fontSize:12}}>← Retour</button><span style={{color:T.txt,fontWeight:800,fontSize:15,flex:1}}>👤 Profil</span></div>
@@ -501,6 +517,8 @@ function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll}){
         <button onClick={debugCoins} style={{width:"100%",background:"linear-gradient(135deg,#f39c12,#e67e22)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🪙 +1 000 000 pièces</button>
         <button onClick={()=>setShowRanks(true)} style={{width:"100%",background:"linear-gradient(135deg,#2980b9,#1a5276)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🏅 Voir tous les rangs</button>
         <button onClick={onUnlockAll} style={{width:"100%",background:"linear-gradient(135deg,#8e44ad,#6c3483)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🔓 Unlock ALL (skins &amp; thèmes)</button>
+        <button onClick={onMasterAll} style={{width:"100%",background:"linear-gradient(135deg,#27ae60,#1e8449)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>⭐ Maîtriser tous les mots (debug)</button>
+        {currentLang&&<button onClick={()=>onResetLang(currentLang)} style={{width:"100%",background:"linear-gradient(135deg,#c0392b,#96281b)",border:"none",borderRadius:12,padding:"11px",cursor:"pointer",fontWeight:800,fontSize:13,color:"#fff"}}>🗑 Reset progression ({currentLang.toUpperCase()})</button>}
       </div>
       {showRanks&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
@@ -509,10 +527,10 @@ function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll}){
               <span style={{color:T.txt,fontWeight:900,fontSize:16}}>🏅 Tous les rangs</span>
               <button onClick={()=>setShowRanks(false)} style={{background:"rgba(255,255,255,.08)",border:"none",color:T.sub,borderRadius:8,padding:"4px 9px",cursor:"pointer",fontSize:14}}>✕</button>
             </div>
-            {RANKS.map((r,i)=>(
+            {RANK_LEVELS.map((r)=>(
               <div key={r.id} style={{display:"flex",alignItems:"center",gap:14,padding:"10px 12px",background:"rgba(255,255,255,.04)",border:`1px solid ${r.col}33`,borderRadius:12,marginBottom:8}}>
                 <RankBadge rank={r} size={52}/>
-                <div><div style={{color:r.col,fontWeight:900,fontSize:15,textShadow:`0 0 8px ${r.col}88`}}>{r.l}</div><div style={{color:T.sub,fontSize:11,marginTop:2}}>{i===0?"Départ":RANK_XP[i].toLocaleString()+" XP"}</div></div>
+                <div><div style={{color:r.col,fontWeight:900,fontSize:15,textShadow:`0 0 8px ${r.col}88`}}>{r.l}</div><div style={{color:T.sub,fontSize:11,marginTop:2}}>{r.cumXP===0?"Départ":r.cumXP.toLocaleString()+" XP cumulés"}</div></div>
               </div>
             ))}
           </div>
@@ -540,9 +558,10 @@ function HomeScreen({state,T,onSelect,onProfile,onLeaderboard}){
   return(<div style={{minHeight:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:`linear-gradient(135deg,${T.bg},${T.surf})`,padding:20,fontFamily:"'Segoe UI',sans-serif",position:"relative"}}>
     <div style={{position:"absolute",top:12,right:12,display:"flex",gap:8}}><button onClick={()=>{SFX.nav();onLeaderboard();}} style={{background:"rgba(255,255,255,.07)",border:`1px solid ${T.brd}`,color:T.sub,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:12}}>🏆</button><button onClick={()=>{SFX.nav();onProfile();}} style={{background:"rgba(255,255,255,.07)",border:`1px solid ${T.brd}`,color:T.sub,borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:12}}>👤 {state.pseudo}</button></div>
     <h1 style={{color:T.txt,fontSize:24,margin:"0 0 4px",fontWeight:900,textAlign:"center"}}>🌍 Basic Languages</h1>
-    <p style={{color:T.sub,marginBottom:28,textAlign:"center",fontSize:13}}>Maîtrisez les fondamentaux</p>
+    <p style={{color:T.sub,marginBottom:4,textAlign:"center",fontSize:13}}>Maîtrisez les fondamentaux</p>
+    <span style={{color:"rgba(255,255,255,.25)",fontSize:9,fontWeight:700,letterSpacing:1,marginBottom:24}}>v2.1</span>
     <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center",width:"100%",maxWidth:420}}>
-      {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank,xpIn,xpNeed,isMax}=getRankInfo(ls.xp||0);const rPct=isMax?100:Math.min(100,Math.round(xpIn/xpNeed*100));
+      {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank,xIn,xNeed,isMax,pct:rPct}=getRankInfo(ls.xp||0);
       return(<button key={lk} onClick={()=>{SFX.nav();onSelect(lk);}} style={{background:"rgba(255,255,255,.05)",border:`1px solid ${T.brd}`,borderRadius:20,padding:"16px 0",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,flex:"1 1 140px",maxWidth:195,transition:"all .2s",position:"relative"}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,.1)";e.currentTarget.style.transform="translateY(-4px)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.05)";e.currentTarget.style.transform="";}}>
         <span style={{fontSize:52,lineHeight:1}}>{li.flag}</span>
         <span style={{color:T.txt,fontSize:16,fontWeight:900,letterSpacing:-.3}}>{li.label}</span>
@@ -558,15 +577,22 @@ function HomeScreen({state,T,onSelect,onProfile,onLeaderboard}){
 
 function PseudoSetup({T,onDone}){const [val,setVal]=useState("");return(<div style={{height:"100vh",width:"100vw",display:"flex",alignItems:"center",justifyContent:"center",background:`linear-gradient(135deg,${T.bg},${T.surf})`,fontFamily:"'Segoe UI',sans-serif",padding:24}}><div style={{background:"rgba(255,255,255,.05)",border:`1px solid ${T.brd}`,borderRadius:22,padding:"30px 20px",maxWidth:290,width:"100%",textAlign:"center"}}><div style={{fontSize:48,marginBottom:10}}>🌍</div><div style={{color:T.txt,fontWeight:900,fontSize:19,marginBottom:4}}>Bienvenue !</div><div style={{color:T.sub,fontSize:13,marginBottom:20}}>Choisissez un pseudo pour le classement</div><input value={val} onChange={e=>setVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&val.trim()&&onDone(val.trim())} maxLength={20} placeholder="Votre pseudo..." style={{width:"100%",background:"rgba(255,255,255,.08)",border:`1px solid ${T.acc}`,borderRadius:10,padding:"10px 12px",color:T.txt,fontSize:15,outline:"none",marginBottom:12,boxSizing:"border-box"}}/><button onClick={()=>{if(val.trim())onDone(val.trim());}} disabled={!val.trim()} style={{width:"100%",background:val.trim()?`linear-gradient(135deg,${T.acc},${T.acc}99)`:"rgba(255,255,255,.05)",color:val.trim()?"#000":T.sub,border:"none",borderRadius:10,padding:"12px",cursor:val.trim()?"pointer":"default",fontWeight:800,fontSize:15}}>Commencer 🚀</button></div></div>);}
 
+// ── QUEST TOAST ───────────────────────────────────────────────────────────
+function QuestToast({toast,T}:{toast:{label:string,xp:number,coins:number},T:typeof THEMES.default}){
+  return(<div style={{position:"fixed",top:16,right:16,zIndex:400,animation:"slideInRight .4s cubic-bezier(.2,1.3,.4,1)",pointerEvents:"none",maxWidth:240}}><div style={{background:"linear-gradient(135deg,rgba(39,174,96,0.95),rgba(26,110,61,0.95))",border:"1.5px solid rgba(39,174,96,0.7)",borderRadius:16,padding:"12px 16px",boxShadow:"0 8px 32px rgba(0,0,0,.6)",backdropFilter:"blur(8px)"}}><div style={{color:"#fff",fontWeight:800,fontSize:13,marginBottom:4}}>✅ Quête accomplie !</div><div style={{color:"rgba(255,255,255,.85)",fontSize:11,marginBottom:6,lineHeight:1.3}}>{toast.label}</div><div style={{display:"flex",gap:10}}><span style={{color:"#4ecdc4",fontSize:11,fontWeight:700}}>+{toast.xp} XP</span><span style={{display:"flex",alignItems:"center",gap:3,color:"#ffd700",fontSize:11,fontWeight:700}}><CoinIcon size={10}/>+{toast.coins}</span></div></div></div>);}
+
 // ── MAIN APP ──────────────────────────────────────────────────────────────
 export default function App(){
   const [appState,setAppState]=useState(null);const [screen,setScreen]=useState("loading");const [lang,setLang]=useState(null);const [tab,setTab]=useState("lessons");
-  useEffect(()=>{(async()=>{try{const r=await window.storage.get(SK);if(r?.value){const s=JSON.parse(r.value);if(!s.uuid)s.uuid=genUUID();["en","de","es","it"].forEach(lk=>{if(!s.langs[lk])s.langs[lk]=mkL();const l=s.langs[lk];if(l.coins==null)l.coins=0;if(!l.rawScores)l.rawScores={};if(!l.equipped)l.equipped={theme:"default",skin:"default"};if(!l.inventory)l.inventory=[];if(!l.quests)l.quests={date:"",progress:{},done:[]};if(!l.quests.done)l.quests.done=[];});if(!s.badges)s.badges=[];setAppState(s);setScreen(s.pseudo?"home":"setup");}else{const s={...DEF,uuid:genUUID()};setAppState(s);setScreen("setup");}}catch{const s={...DEF,uuid:genUUID()};setAppState(s);setScreen("setup");}})();},[]);
+  const [questToast,setQuestToast]=useState<{label:string,xp:number,coins:number}|null>(null);
+  const questToastTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+  useEffect(()=>{(async()=>{try{const r=await window.storage.get(SK);if(r?.value){const s=JSON.parse(r.value);if(!s.uuid)s.uuid=genUUID();["en","de","es","it"].forEach(lk=>{if(!s.langs[lk])s.langs[lk]=mkL();const l=s.langs[lk];if(l.coins==null)l.coins=0;if(!l.rawScores)l.rawScores={};if(!l.equipped)l.equipped={theme:"default",skin:"default"};if(!l.inventory)l.inventory=[];if(!l.quests)l.quests={date:"",progress:{},done:[]};if(!l.quests.done)l.quests.done=[];if(!l.weeklyQuests)l.weeklyQuests={week:"",progress:{},done:[]};});if(!s.badges)s.badges=[];setAppState(s);setScreen(s.pseudo?"home":"setup");}else{const s={...DEF,uuid:genUUID()};setAppState(s);setScreen("setup");}}catch{const s={...DEF,uuid:genUUID()};setAppState(s);setScreen("setup");}})();},[]);
   const save=useCallback(async s=>{try{await window.storage.set(SK,JSON.stringify(s));}catch{}},[]);
   async function updateLB(uuid,pseudo,langs){try{await window.storage.set("lb:"+uuid,JSON.stringify({uuid,pseudo,xp_en:langs.en.xp,xp_de:langs.de.xp,xp_es:langs.es.xp,xp_it:langs.it.xp}),true);}catch{}}
   function setState(fn){setAppState(prev=>{const next=fn(prev);save(next);if(next.pseudo&&next.uuid)updateLB(next.uuid,next.pseudo,next.langs);return next;});}
   const questDef=useMemo(()=>lang?getDailyQuests(todayStr()+lang):[],[lang]);
-  function ensureQFresh(s,lk){const l={...s.langs[lk]};const today=todayStr();if(l.quests.date!==today)l.quests={date:today,progress:{},done:[]};return{...s,langs:{...s.langs,[lk]:l}};}
+  const weeklyQuestDef=useMemo(()=>lang?getWeeklyQuests(weekStr(),lang):[],[lang]);
+  function ensureQFresh(s,lk){const l={...s.langs[lk]};const today=todayStr();if(l.quests.date!==today)l.quests={date:today,progress:{},done:[]};if(!l.weeklyQuests||l.weeklyQuests.week!==weekStr())l.weeklyQuests={week:weekStr(),progress:{},done:[]};return{...s,langs:{...s.langs,[lk]:l}};}
 
   function handleScore(word,correct,xpEarned,coinsEarned,streak,jp){
     if(!lang)return;
@@ -574,8 +600,11 @@ export default function App(){
       let s=ensureQFresh({...prev},lang);
       const l=s.langs[lang];
       const newRaw=updateRaw(l.rawScores[word],correct);
+      const oldLi=getRankInfo(l.xp||0).levelIdx;
       const newXp=(l.xp||0)+xpEarned;
-      const newLang={...l,rawScores:{...l.rawScores,[word]:newRaw},xp:newXp,coins:(l.coins||0)+coinsEarned};
+      const newLi=getRankInfo(newXp).levelIdx;
+      let rankCoins=0;for(let li=oldLi+1;li<=newLi;li++){const rr=RANK_REWARDS[li as keyof typeof RANK_REWARDS];if(rr)rankCoins+=rr.coins;}
+      const newLang={...l,rawScores:{...l.rawScores,[word]:newRaw},xp:newXp,coins:(l.coins||0)+coinsEarned+rankCoins};
       const badges=new Set(s.badges);
       const nm=Object.values(newLang.rawScores).filter(r=>r>=70).length;
       // Streak badges — fix: check all thresholds
@@ -590,14 +619,29 @@ export default function App(){
     });
   }
 
+  function showQuestToast(q:{label:string,xp:number,coins:number}){if(questToastTimer.current)clearTimeout(questToastTimer.current);setQuestToast(q);questToastTimer.current=setTimeout(()=>setQuestToast(null),3200);}
+
   function handleQP({cardFlipped,streak,xpEarned,mastered}){
     if(!lang)return;
+    // Detect completions outside setState for toast (using snapshot)
+    if(appState){
+      const l=appState.langs[lang];const today=todayStr();
+      const prevProg=l.quests?.date===today?l.quests.progress||{}:{};
+      const prevDone=l.quests?.date===today?l.quests.done||[]:[];
+      questDef.forEach(q=>{if(prevDone.includes(q.id))return;const pv=prevProg[q.id]||0;let v=pv;if(q.t==="cards")v=pv+cardFlipped;if(q.t==="streak")v=Math.max(pv,streak);if(q.t==="xp")v=pv+xpEarned;if(q.t==="master")v=pv+mastered;if(v>=q.n)showQuestToast(q);});
+      const ws=weekStr();const wq=l.weeklyQuests||{week:"",progress:{},done:[]};
+      const wpProg=wq.week===ws?wq.progress||{}:{};const wpDone=wq.week===ws?wq.done||[]:[];
+      weeklyQuestDef.forEach(q=>{if(wpDone.includes(q.id))return;const pv=wpProg[q.id]||0;let v=pv;if(q.t==="cards")v=pv+cardFlipped;if(q.t==="streak")v=Math.max(pv,streak);if(q.t==="xp")v=pv+xpEarned;if(q.t==="master")v=pv+mastered;if(v>=q.n)showQuestToast(q);});
+    }
     setState(prev=>{
       let s=ensureQFresh({...prev},lang);
       const l=s.langs[lang];const prog={...l.quests.progress},done=[...(l.quests.done||[])];
       let bXP=0,bCoins=0;
       questDef.forEach(q=>{if(done.includes(q.id))return;const pv=prog[q.id]||0;let v=pv;if(q.t==="cards")v=pv+cardFlipped;if(q.t==="streak")v=Math.max(pv,streak);if(q.t==="xp")v=pv+xpEarned;if(q.t==="master")v=pv+mastered;prog[q.id]=v;if(v>=q.n){done.push(q.id);bXP+=q.xp;bCoins+=q.coins;SFX.quest();}});
-      const newLang={...l,quests:{...l.quests,progress:prog,done},xp:(l.xp||0)+bXP,coins:(l.coins||0)+bCoins};
+      // Weekly quests
+      const wq={...l.weeklyQuests};const wprog={...wq.progress},wdone=[...(wq.done||[])];
+      weeklyQuestDef.forEach(q=>{if(wdone.includes(q.id))return;const pv=wprog[q.id]||0;let v=pv;if(q.t==="cards")v=pv+cardFlipped;if(q.t==="streak")v=Math.max(pv,streak);if(q.t==="xp")v=pv+xpEarned;if(q.t==="master")v=pv+mastered;wprog[q.id]=v;if(v>=q.n){wdone.push(q.id);bXP+=q.xp;bCoins+=q.coins;SFX.quest();}});
+      const newLang={...l,quests:{...l.quests,progress:prog,done},weeklyQuests:{...wq,progress:wprog,done:wdone},xp:(l.xp||0)+bXP,coins:(l.coins||0)+bCoins};
       return{...s,langs:{...s.langs,[lang]:newLang}};
     });
   }
@@ -606,7 +650,7 @@ export default function App(){
   function handleOpenBox(cost,itemId){if(!lang)return;setState(prev=>{const l=prev.langs[lang];const newL={...l,coins:Math.max(0,(l.coins||0)-cost),inventory:l.inventory.includes(itemId)?l.inventory:[...l.inventory,itemId]};return{...prev,langs:{...prev.langs,[lang]:newL}};});}
   function handleChangePseudo(p){setState(s=>({...s,pseudo:p}));}
   // DEBUG: add 100k coins to all langs (hidden, triggered by tapping version 5×)
-  function debugCoins(){setState(prev=>{const langs={};Object.keys(prev.langs).forEach(lk=>{langs[lk]={...prev.langs[lk],coins:(prev.langs[lk].coins||0)+100000};});return{...prev,langs};});}
+  function debugCoins(){setState(prev=>{const langs={};Object.keys(prev.langs).forEach(lk=>{langs[lk]={...prev.langs[lk],coins:(prev.langs[lk].coins||0)+1000000};});return{...prev,langs};});}
   function handleUnlockAll(){
     const allSkinIds=Object.keys(SKINS).filter(k=>k!=="default").map(k=>"skin_"+k);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -615,6 +659,10 @@ export default function App(){
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setState((prev:any)=>{const langs:any={};Object.keys(prev.langs).forEach((lk:string)=>{const existing=prev.langs[lk].inventory||[];const merged=[...new Set([...existing,...allItems])];langs[lk]={...prev.langs[lk],inventory:merged};});return{...prev,langs};});
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function handleResetLang(lk:string){setState((prev:any)=>{const fresh=mkL();const kept={equipped:prev.langs[lk].equipped,inventory:prev.langs[lk].inventory};return{...prev,langs:{...prev.langs,[lk]:{...fresh,...kept}}};});}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function handleMasterAll(){setState((prev:any)=>{const langs:any={};Object.keys(prev.langs).forEach((lk:string)=>{const rs:any={};WORDS[lk].forEach(([w]:[string,string])=>{rs[w]=100;});langs[lk]={...prev.langs[lk],rawScores:rs};});return{...prev,langs};});}
 
   if(screen==="loading"||!appState)return <div style={{height:"100vh",width:"100vw",display:"flex",alignItems:"center",justifyContent:"center",background:"#050510",color:"#fff",fontFamily:"sans-serif"}}>Chargement…</div>;
   
@@ -623,16 +671,19 @@ export default function App(){
   const skinKey=lang?(langState.equipped?.skin||"default"):"default";
 
   if(screen==="setup")return <PseudoSetup T={T} onDone={p=>{setState(s=>({...s,pseudo:p}));setScreen("home");}}/>;
-  if(screen==="profile")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><ProfileScreen state={appState} T={T} onBack={()=>{SFX.nav();setScreen(lang?"lang":"home");}} onChangePseudo={handleChangePseudo} debugCoins={debugCoins} onUnlockAll={handleUnlockAll}/></div>;
+  if(screen==="profile")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><ProfileScreen state={appState} T={T} onBack={()=>{SFX.nav();setScreen(lang?"lang":"home");}} onChangePseudo={handleChangePseudo} debugCoins={debugCoins} onUnlockAll={handleUnlockAll} onResetLang={handleResetLang} onMasterAll={handleMasterAll} currentLang={lang}/></div>;
   if(screen==="leaderboard")return <div style={{height:"100vh",width:"100vw",overflow:"hidden",background:T.bg}}><LeaderboardScreen T={T} onBack={()=>{SFX.nav();setScreen("home");}} myUUID={appState.uuid}/></div>;
   if(!lang||screen==="home")return <div style={{height:"100vh",width:"100vw",overflow:"auto",background:T.bg}}><HomeScreen state={appState} T={T} onSelect={lk=>{SFX.nav();setLang(lk);setTab("lessons");setScreen("lang");}} onProfile={()=>{SFX.nav();setScreen("profile");}} onLeaderboard={()=>{SFX.nav();setScreen("leaderboard");}}/></div>;
 
   const words=WORDS[lang];const today=todayStr();
   const questsData=langState.quests.date===today?langState.quests:{date:today,progress:{},done:[]};
-  const TABS=[{k:"lessons",l:"📚"},{k:"quiz",l:"🧠"},{k:"quests",l:"🎯"},{k:"shop",l:"🛍"}];
+  const ws=weekStr();const weeklyQuestsData=langState.weeklyQuests?.week===ws?langState.weeklyQuests:{week:ws,progress:{},done:[]};
+  const {levelIdx:curLevelIdx}=getRankInfo(langState.xp||0);
+  const TABS=[{k:"lessons",l:"📚",n:"Leçons"},{k:"quiz",l:"🧠",n:"Quiz"},{k:"quests",l:"🎯",n:"Quêtes"},{k:"shop",l:"🛍",n:"Shop"}];
 
   return(<div style={{height:"100vh",width:"100vw",maxWidth:"100vw",display:"flex",flexDirection:"column",overflow:"hidden",background:T.bg,fontFamily:"'Segoe UI',sans-serif"}}>
-    <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}body,html{margin:0;padding:0;overflow:hidden;height:100%;}@keyframes pop{0%{transform:scale(.4)}65%{transform:scale(1.25)}100%{transform:scale(1)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}@keyframes milAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}@keyframes popIn{0%{opacity:0;transform:scale(.5)}70%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}@keyframes flamePulse{from{transform:scale(1)}to{transform:scale(1.1)}}@keyframes flameRise{0%{transform:scaleX(0.82) scaleY(0.86) translateY(3px);opacity:0.6}100%{transform:scaleX(1.14) scaleY(1.1) translateY(-4px);opacity:1}}@keyframes holoShift{from{opacity:0.6}to{opacity:1}}@keyframes cursedFlicker{0%,100%{opacity:1}50%{opacity:.7}}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}`}</style>
+    <style>{`*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}body,html{margin:0;padding:0;overflow:hidden;height:100%;}@keyframes pop{0%{transform:scale(.4)}65%{transform:scale(1.25)}100%{transform:scale(1)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-26px)}}@keyframes milAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}@keyframes popIn{0%{opacity:0;transform:scale(.5)}70%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}@keyframes flamePulse{from{transform:scale(1)}to{transform:scale(1.1)}}@keyframes flameRise{0%{transform:scaleX(0.82) scaleY(0.86) translateY(3px);opacity:0.6}100%{transform:scaleX(1.14) scaleY(1.1) translateY(-4px);opacity:1}}@keyframes holoShift{from{opacity:0.6}to{opacity:1}}@keyframes cursedFlicker{0%,100%{opacity:1}50%{opacity:.7}}@keyframes slideInRight{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}`}</style>
+    {questToast&&<QuestToast toast={questToast} T={T}/>}
     <div style={{padding:"7px 12px",background:"rgba(0,0,0,0.45)",borderBottom:`1px solid ${T.brd}`,flexShrink:0,backdropFilter:"blur(8px)"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
         <button onClick={()=>{SFX.nav();setScreen("home");setLang(null);}} style={{background:"rgba(255,255,255,.06)",border:`1px solid ${T.brd}`,color:"rgba(255,255,255,.5)",borderRadius:7,padding:"3px 8px",cursor:"pointer",fontSize:11,flexShrink:0}}>← Menu</button>
@@ -643,10 +694,10 @@ export default function App(){
       <ProgressHeader ls={langState} T={T}/>
     </div>
     <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
-      <div style={{display:tab==="lessons"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><LessonsTab words={words} rs={langState.rawScores} langKey={lang} T={T}/></div>
-      <div style={{display:tab==="quiz"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP}/></div>
-      <div style={{display:tab==="quests"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuestsTab quests={questsData} questDef={questDef} T={T}/></div>
+      <div style={{display:tab==="lessons"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><LessonsTab words={words} rs={langState.rawScores} langKey={lang} T={T} levelIdx={curLevelIdx}/></div>
+      <div style={{display:tab==="quiz"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP} isActive={tab==="quiz"} curXp={langState.xp||0}/></div>
+      <div style={{display:tab==="quests"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuestsTab quests={questsData} questDef={questDef} weeklyQuests={weeklyQuestsData} weeklyQuestDef={weeklyQuestDef} T={T}/></div>
       <div style={{display:tab==="shop"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><ShopTab langState={langState} T={T} onEquip={handleEquip} onOpenBox={handleOpenBox}/></div>
     </div>
-    <div style={{display:"flex",borderTop:`1px solid ${T.brd}`,background:"rgba(0,0,0,0.45)",flexShrink:0,backdropFilter:"blur(8px)"}}>{TABS.map(({k,l})=>(<button key={k} onClick={()=>{SFX.nav();setTab(k);}} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:tab===k?T.acc:T.sub,fontWeight:tab===k?700:400,fontSize:18,padding:"11px 0",borderTop:`2px solid ${tab===k?T.acc:"transparent"}`,transition:"all .15s",textShadow:tab===k?`0 0 10px ${T.acc}`:"none"}}>{l}</button>))}</div>
+    <div style={{display:"flex",borderTop:`1px solid ${T.brd}`,background:"rgba(0,0,0,0.45)",flexShrink:0,backdropFilter:"blur(8px)"}}>{TABS.map(({k,l,n})=>(<button key={k} onClick={()=>{SFX.nav();setTab(k);}} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:tab===k?T.acc:T.sub,padding:"8px 0 6px",borderTop:`2px solid ${tab===k?T.acc:"transparent"}`,transition:"all .15s",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><span style={{fontSize:18,textShadow:tab===k?`0 0 10px ${T.acc}`:"none"}}>{l}</span><span style={{fontSize:9,fontWeight:tab===k?700:400,letterSpacing:.3}}>{n}</span></button>))}</div>
   </div>);}

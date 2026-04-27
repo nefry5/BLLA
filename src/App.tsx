@@ -10,6 +10,7 @@ lootL:()=>{[523,659,784,1047,1319].forEach((f,i)=>tn(f,"sine",.3,.24,i*.07))},
 lootS:()=>{[261,330,523,784,1047].forEach((f,i)=>tn(f,"triangle",.38,.3,i*.09));tn(220,"sawtooth",.2,.12,.45)}
 };
 const getScore=r=>r==null?null:r/10,updateRaw=(r,ok)=>Math.max(0,Math.min(100,(r??0)+(ok?10:-20))),noteCol=s=>s==null?"#444":s<4?"#e74c3c":s<7?"#f39c12":"#27ae60",xpGain=s=>10+Math.floor(Math.min(s,1000)/2),genUUID=()=>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&0x3|0x8)).toString(16);});
+const fmtCoins=(n:number)=>n>=1e6?`${(n/1e6).toFixed(1)}M`:n>=1000?`${(n/1000).toFixed(1)}k`:`${n}`;
 const BASE_RANKS={wood:{col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",wings:false},bronze:{col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",wings:false},silver:{col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",wings:false},gold:{col:"#ffd700",glow:"#ffe44d",sf:"#FFD700",si:"#2266AA",ss:"#FFF44D",wings:true},diamond:{col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",wings:true},plat:{col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",wings:true},solar:{col:"#ff9800",glow:"#ffcc44",sf:"#FF6600",si:"#AA2200",ss:"#FFE044",wings:true}};
 const _rl=(bid,sub,l,cumXP,xpCap)=>({...BASE_RANKS[bid],id:sub===0?bid:bid+sub,baseId:bid,sub,l,cumXP,xpCap,nStars:sub===0?5:sub});
 const RANK_LEVELS=[_rl("wood",1,"Bois I",0,100),_rl("wood",2,"Bois II",100,200),_rl("wood",3,"Bois III",300,300),_rl("bronze",1,"Bronze I",600,400),_rl("bronze",2,"Bronze II",1000,500),_rl("bronze",3,"Bronze III",1500,800),_rl("silver",1,"Argent I",2300,900),_rl("silver",2,"Argent II",3200,1000),_rl("silver",3,"Argent III",4200,1200),_rl("gold",1,"Or I",5400,1400),_rl("gold",2,"Or II",6800,1600),_rl("gold",3,"Or III",8400,2000),_rl("diamond",1,"Diamant I",10400,2500),_rl("diamond",2,"Diamant II",12900,3000),_rl("diamond",3,"Diamant III",15900,5000),_rl("plat",1,"Platine I",20900,10000),_rl("plat",2,"Platine II",30900,15000),_rl("plat",3,"Platine III",45900,25000),_rl("solar",0,"Solaire",70900,Infinity)];
@@ -63,13 +64,53 @@ function OCursed(){return <div style={{...FA,animation:"cursedFlicker 2s ease in
 const SK_OVLS={parchment:OParchment,bamboo:OBamboo,slate:OSlate,washi:OWashi,crystal:OCrystal,holo:OHolo,leather:OLeather,metal:OMetal,coral:OCoral,dragon:ODragon,obsidian:OObsidian,marble_w:OMarbleW,marble_b:OMarbleB,neon_v:ONeonV,celestial:OCelestial,circuit:OCircuit,inferno:OInferno,abyssal:OAbyssal,cursed:OCursed};
 const SKINS={default:{label:"Standard",rarity:"commun",tc:"#fff",brd:"rgba(255,255,255,.08)",bg1:"#1a1f3a",bg2:"#0f1225",free:true,ovl:null},parchment:{label:"Parchemin",rarity:"commun",tc:"#3d2b0e",brd:"rgba(160,100,20,.6)",bg1:"#c9a86c",bg2:"#b08040",ovl:"parchment"},bamboo:{label:"Bambou",rarity:"commun",tc:"#c8ffc8",brd:"rgba(80,160,40,.4)",bg1:"#3d5a2d",bg2:"#2d4a1d",ovl:"bamboo"},slate:{label:"Ardoise",rarity:"commun",tc:"#e0e0d8",brd:"rgba(120,120,110,.4)",bg1:"#2c2c2c",bg2:"#1a1a1a",ovl:"slate"},washi:{label:"Papier Washi",rarity:"commun",tc:"#3a2a1a",brd:"rgba(140,100,60,.4)",bg1:"#ede5d5",bg2:"#ddd0b8",ovl:"washi"},crystal:{label:"Cristal Bleu",rarity:"rare",tc:"#e0f4ff",brd:"rgba(100,200,255,.45)",bg1:"#0a2040",bg2:"#051020",ovl:"crystal"},holo:{label:"Holographique",rarity:"rare",tc:"#fff",brd:"rgba(200,100,255,.5)",bg1:"#1a1a2a",bg2:"#2a1a2a",ovl:"holo"},leather:{label:"Cuir Vintage",rarity:"rare",tc:"#f5e8c0",brd:"rgba(160,90,30,.5)",bg1:"#3a1a08",bg2:"#261008",ovl:"leather"},metal:{label:"Métal Brossé",rarity:"rare",tc:"#ddeeff",brd:"rgba(100,140,200,.35)",bg1:"#2a3040",bg2:"#1a2030",ovl:"metal"},coral:{label:"Corail",rarity:"super_rare",tc:"#fff0e8",brd:"rgba(255,100,80,.45)",bg1:"#2a0a10",bg2:"#180508",ovl:"coral"},dragon:{label:"Écailles Dragon",rarity:"super_rare",tc:"#c8ffcc",brd:"rgba(0,200,80,.4)",bg1:"#0a1a0a",bg2:"#051205",ovl:"dragon"},obsidian:{label:"Obsidienne",rarity:"super_rare",tc:"#e0d0ff",brd:"rgba(140,0,220,.45)",bg1:"#0a0510",bg2:"#050208",ovl:"obsidian"},marble_w:{label:"Marbre Blanc",rarity:"super_rare",tc:"#2a2a2a",brd:"rgba(180,160,100,.5)",bg1:"#f0f0f0",bg2:"#e0e0e0",ovl:"marble_w"},neon_v:{label:"Néon Violet",rarity:"epique",tc:"#ff88ff",brd:"rgba(200,0,255,.7)",bg1:"#0d001a",bg2:"#07000d",ovl:"neon_v"},marble_b:{label:"Marbre Noir",rarity:"epique",tc:"#ffd700",brd:"rgba(255,215,0,.45)",bg1:"#0a0a0a",bg2:"#050505",ovl:"marble_b"},celestial:{label:"Céleste",rarity:"epique",tc:"#ffd700",brd:"rgba(255,215,0,.4)",bg1:"#020a1a",bg2:"#01050d",ovl:"celestial"},circuit:{label:"Circuit",rarity:"epique",tc:"#00ff88",brd:"rgba(0,255,68,.4)",bg1:"#000a05",bg2:"#000502",ovl:"circuit"},inferno:{label:"Inferno",rarity:"legendaire",tc:"#ffcc44",brd:"rgba(255,100,0,.5)",bg1:"#0a0200",bg2:"#050100",ovl:"inferno"},abyssal:{label:"Abyssal",rarity:"legendaire",tc:"#44ffee",brd:"rgba(0,255,220,.45)",bg1:"#000510",bg2:"#000208",ovl:"abyssal"},cursed:{label:"??? Carte Maudite",rarity:"secret",tc:"#ff4444",brd:"rgba(200,0,0,.6)",bg1:"#000000",bg2:"#000000",ovl:"cursed"}};
 
+// Probabilities: 70/25/4/1 per rarity tier; split evenly within each rarity
 const LOOT_BOXES=[
-  {id:"sk_b",label:"Coffre Bois",sub:"Skins",type:"skin",cost:250,col:"#8B4513",level:"wood",pool:[{id:"skin_parchment",p:.35,name:"Parchemin",rar:"commun"},{id:"skin_bamboo",p:.28,name:"Bambou",rar:"commun"},{id:"skin_slate",p:.22,name:"Ardoise",rar:"commun"},{id:"skin_washi",p:.12,name:"Papier Washi",rar:"commun"},{id:"skin_crystal",p:.02,name:"Cristal Bleu",rar:"rare"},{id:"skin_holo",p:.01,name:"Holographique",rar:"rare"}]},
-  {id:"sk_g",label:"Coffre Or",sub:"Skins",type:"skin",cost:1000,col:"#ffd700",level:"gold",pool:[{id:"skin_crystal",p:.25,name:"Cristal Bleu",rar:"rare"},{id:"skin_holo",p:.22,name:"Holographique",rar:"rare"},{id:"skin_leather",p:.20,name:"Cuir Vintage",rar:"rare"},{id:"skin_metal",p:.14,name:"Métal Brossé",rar:"rare"},{id:"skin_coral",p:.07,name:"Corail",rar:"super_rare"},{id:"skin_dragon",p:.05,name:"Écailles Dragon",rar:"super_rare"},{id:"skin_obsidian",p:.04,name:"Obsidienne",rar:"super_rare"},{id:"skin_marble_w",p:.02,name:"Marbre Blanc",rar:"super_rare"},{id:"skin_marble_b",p:.01,name:"Marbre Noir",rar:"epique"}]},
-  {id:"sk_l",label:"Coffre Légendaire",sub:"Skins",type:"skin",cost:5000,col:"#ff9800",level:"leg",pool:[{id:"skin_coral",p:.13,name:"Corail",rar:"super_rare"},{id:"skin_dragon",p:.12,name:"Écailles Dragon",rar:"super_rare"},{id:"skin_obsidian",p:.12,name:"Obsidienne",rar:"super_rare"},{id:"skin_marble_w",p:.10,name:"Marbre Blanc",rar:"super_rare"},{id:"skin_neon_v",p:.14,name:"Néon Violet",rar:"epique"},{id:"skin_marble_b",p:.12,name:"Marbre Noir",rar:"epique"},{id:"skin_celestial",p:.10,name:"Céleste",rar:"epique"},{id:"skin_circuit",p:.07,name:"Circuit",rar:"epique"},{id:"skin_inferno",p:.05,name:"Inferno",rar:"legendaire"},{id:"skin_abyssal",p:.04,name:"Abyssal",rar:"legendaire"},{id:"skin_cursed",p:.01,name:"???",rar:"secret",secret:true}]},
-  {id:"th_b",label:"Coffre Bois",sub:"Thèmes",type:"theme",cost:250,col:"#8B4513",level:"wood",pool:[{id:"theme_zen",p:.35,name:"Forêt Zen",rar:"commun"},{id:"theme_arctic",p:.28,name:"Arctic Frost",rar:"commun"},{id:"theme_sakura",p:.22,name:"Sakura Nuit",rar:"commun"},{id:"theme_desert",p:.12,name:"Désert Antique",rar:"commun"},{id:"theme_abyss",p:.02,name:"Océan Abyssal",rar:"rare"},{id:"theme_pixel",p:.01,name:"Pixel Rétro",rar:"rare"}]},
-  {id:"th_g",label:"Coffre Or",sub:"Thèmes",type:"theme",cost:1000,col:"#ffd700",level:"gold",pool:[{id:"theme_abyss",p:.22,name:"Océan Abyssal",rar:"rare"},{id:"theme_pixel",p:.18,name:"Pixel Rétro",rar:"rare"},{id:"theme_jungle",p:.16,name:"Jungle Néon",rar:"rare"},{id:"theme_volcano",p:.13,name:"Volcan",rar:"rare"},{id:"theme_steam",p:.12,name:"Steampunk",rar:"rare"},{id:"theme_cyber",p:.08,name:"Cyberpunk 2099",rar:"super_rare"},{id:"theme_scriptorium",p:.06,name:"Scriptorium",rar:"super_rare"},{id:"theme_cosmos",p:.03,name:"Cosmos",rar:"super_rare"},{id:"theme_spectre",p:.02,name:"Spectre Violet",rar:"super_rare"}]},
-  {id:"th_l",label:"Coffre Légendaire",sub:"Thèmes",type:"theme",cost:5000,col:"#aa00ff",level:"leg",pool:[{id:"theme_cyber",p:.13,name:"Cyberpunk 2099",rar:"super_rare"},{id:"theme_scriptorium",p:.11,name:"Scriptorium",rar:"super_rare"},{id:"theme_cosmos",p:.11,name:"Cosmos",rar:"super_rare"},{id:"theme_spectre",p:.09,name:"Spectre Violet",rar:"super_rare"},{id:"theme_royal",p:.14,name:"Royal Gold",rar:"epique"},{id:"theme_bloodmoon",p:.12,name:"Blood Moon",rar:"epique"},{id:"theme_arcane",p:.10,name:"Cristal Arcanique",rar:"epique"},{id:"theme_void_th",p:.09,name:"Void Éternel",rar:"legendaire"},{id:"theme_prism",p:.10,name:"Dimension Prismatique",rar:"legendaire"},{id:"theme_nexus",p:.01,name:"???",rar:"secret",secret:true}]},
+  // sk_b: 4 commun(70%→17.5 each), 2 rare(25%→12.5 each), 2 SR(4%→2 each), 1 epic(1%)
+  {id:"sk_b",label:"Coffre Skins",sub:"Skins",type:"skin",cost:250,col:"#8B4513",level:"wood",pool:[
+    {id:"skin_parchment",p:.175,name:"Parchemin",rar:"commun"},{id:"skin_bamboo",p:.175,name:"Bambou",rar:"commun"},
+    {id:"skin_slate",p:.175,name:"Ardoise",rar:"commun"},{id:"skin_washi",p:.175,name:"Papier Washi",rar:"commun"},
+    {id:"skin_crystal",p:.125,name:"Cristal Bleu",rar:"rare"},{id:"skin_holo",p:.125,name:"Holographique",rar:"rare"},
+    {id:"skin_coral",p:.02,name:"Corail",rar:"super_rare"},{id:"skin_dragon",p:.02,name:"Écailles Dragon",rar:"super_rare"},
+    {id:"skin_neon_v",p:.01,name:"Néon Violet",rar:"epique"}]},
+  // sk_g: 4 rare(70%→17.5 each), 4 SR(25%→6.25 each), 3 epic(4%→1.33 each), 2 leg(1%→0.5 each)
+  {id:"sk_g",label:"Coffre Or",sub:"Skins",type:"skin",cost:1000,col:"#ffd700",level:"gold",pool:[
+    {id:"skin_crystal",p:.175,name:"Cristal Bleu",rar:"rare"},{id:"skin_holo",p:.175,name:"Holographique",rar:"rare"},
+    {id:"skin_leather",p:.175,name:"Cuir Vintage",rar:"rare"},{id:"skin_metal",p:.175,name:"Métal Brossé",rar:"rare"},
+    {id:"skin_coral",p:.0625,name:"Corail",rar:"super_rare"},{id:"skin_dragon",p:.0625,name:"Écailles Dragon",rar:"super_rare"},
+    {id:"skin_obsidian",p:.0625,name:"Obsidienne",rar:"super_rare"},{id:"skin_marble_w",p:.0625,name:"Marbre Blanc",rar:"super_rare"},
+    {id:"skin_neon_v",p:.0133,name:"Néon Violet",rar:"epique"},{id:"skin_marble_b",p:.0133,name:"Marbre Noir",rar:"epique"},{id:"skin_celestial",p:.0134,name:"Céleste",rar:"epique"},
+    {id:"skin_inferno",p:.005,name:"Inferno",rar:"legendaire"},{id:"skin_abyssal",p:.005,name:"Abyssal",rar:"legendaire"}]},
+  // sk_l: 4 SR(70%→17.5 each), 4 epic(25%→6.25 each), 2 leg(4%→2 each), 1 secret(1%)
+  {id:"sk_l",label:"Coffre Légendaire",sub:"Skins",type:"skin",cost:5000,col:"#ff9800",level:"leg",pool:[
+    {id:"skin_coral",p:.175,name:"Corail",rar:"super_rare"},{id:"skin_dragon",p:.175,name:"Écailles Dragon",rar:"super_rare"},
+    {id:"skin_obsidian",p:.175,name:"Obsidienne",rar:"super_rare"},{id:"skin_marble_w",p:.175,name:"Marbre Blanc",rar:"super_rare"},
+    {id:"skin_neon_v",p:.0625,name:"Néon Violet",rar:"epique"},{id:"skin_marble_b",p:.0625,name:"Marbre Noir",rar:"epique"},
+    {id:"skin_celestial",p:.0625,name:"Céleste",rar:"epique"},{id:"skin_circuit",p:.0625,name:"Circuit",rar:"epique"},
+    {id:"skin_inferno",p:.02,name:"Inferno",rar:"legendaire"},{id:"skin_abyssal",p:.02,name:"Abyssal",rar:"legendaire"},
+    {id:"skin_cursed",p:.01,name:"???",rar:"secret",secret:true}]},
+  // th_b: 4 commun(70%→17.5 each), 2 rare(25%→12.5 each), 2 SR(4%→2 each), 1 epic(1%)
+  {id:"th_b",label:"Coffre Thèmes",sub:"Thèmes",type:"theme",cost:250,col:"#8B4513",level:"wood",pool:[
+    {id:"theme_zen",p:.175,name:"Forêt Zen",rar:"commun"},{id:"theme_arctic",p:.175,name:"Arctic Frost",rar:"commun"},
+    {id:"theme_sakura",p:.175,name:"Sakura Nuit",rar:"commun"},{id:"theme_desert",p:.175,name:"Désert Antique",rar:"commun"},
+    {id:"theme_abyss",p:.125,name:"Océan Abyssal",rar:"rare"},{id:"theme_pixel",p:.125,name:"Pixel Rétro",rar:"rare"},
+    {id:"theme_cyber",p:.02,name:"Cyberpunk 2099",rar:"super_rare"},{id:"theme_jungle",p:.02,name:"Jungle Néon",rar:"super_rare"},
+    {id:"theme_royal",p:.01,name:"Royal Gold",rar:"epique"}]},
+  // th_g: 5 rare(70%→14 each), 4 SR(25%→6.25 each), 3 epic(4%→1.33 each), 2 leg(1%→0.5 each)
+  {id:"th_g",label:"Coffre Or",sub:"Thèmes",type:"theme",cost:1000,col:"#ffd700",level:"gold",pool:[
+    {id:"theme_abyss",p:.14,name:"Océan Abyssal",rar:"rare"},{id:"theme_pixel",p:.14,name:"Pixel Rétro",rar:"rare"},
+    {id:"theme_jungle",p:.14,name:"Jungle Néon",rar:"rare"},{id:"theme_volcano",p:.14,name:"Volcan",rar:"rare"},{id:"theme_steam",p:.14,name:"Steampunk",rar:"rare"},
+    {id:"theme_cyber",p:.0625,name:"Cyberpunk 2099",rar:"super_rare"},{id:"theme_scriptorium",p:.0625,name:"Scriptorium",rar:"super_rare"},
+    {id:"theme_cosmos",p:.0625,name:"Cosmos",rar:"super_rare"},{id:"theme_spectre",p:.0625,name:"Spectre Violet",rar:"super_rare"},
+    {id:"theme_royal",p:.0133,name:"Royal Gold",rar:"epique"},{id:"theme_bloodmoon",p:.0133,name:"Blood Moon",rar:"epique"},{id:"theme_arcane",p:.0134,name:"Cristal Arcanique",rar:"epique"},
+    {id:"theme_void_th",p:.005,name:"Void Éternel",rar:"legendaire"},{id:"theme_prism",p:.005,name:"Dimension Prismatique",rar:"legendaire"}]},
+  // th_l: 4 SR(70%→17.5 each), 3 epic(25%→8.33 each), 2 leg(4%→2 each), 1 secret(1%)
+  {id:"th_l",label:"Coffre Légendaire",sub:"Thèmes",type:"theme",cost:5000,col:"#aa00ff",level:"leg",pool:[
+    {id:"theme_cyber",p:.175,name:"Cyberpunk 2099",rar:"super_rare"},{id:"theme_scriptorium",p:.175,name:"Scriptorium",rar:"super_rare"},
+    {id:"theme_cosmos",p:.175,name:"Cosmos",rar:"super_rare"},{id:"theme_spectre",p:.175,name:"Spectre Violet",rar:"super_rare"},
+    {id:"theme_royal",p:.0833,name:"Royal Gold",rar:"epique"},{id:"theme_bloodmoon",p:.0833,name:"Blood Moon",rar:"epique"},{id:"theme_arcane",p:.0834,name:"Cristal Arcanique",rar:"epique"},
+    {id:"theme_void_th",p:.02,name:"Void Éternel",rar:"legendaire"},{id:"theme_prism",p:.02,name:"Dimension Prismatique",rar:"legendaire"},
+    {id:"theme_nexus",p:.01,name:"???",rar:"secret",secret:true}]},
 ];
 function rollLoot(box){const r=Math.random();let c=0;for(const it of box.pool){c+=it.p;if(r<=c)return it;}return box.pool[box.pool.length-1];}
 
@@ -104,24 +145,91 @@ const mkL=()=>({xp:0,coins:0,rawScores:{},equipped:{theme:"default",skin:"defaul
 const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},badges:[]};
 
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
-function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><radialGradient id="cg" cx="38%" cy="30%"><stop offset="0%" stopColor="#fffde7"/><stop offset="50%" stopColor="#ffd700"/><stop offset="100%" stopColor="#c77800"/></radialGradient></defs><circle cx="12" cy="12" r="11" fill="url(#cg)" stroke="#c07000" strokeWidth="1.2"/><circle cx="12" cy="12" r="7" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1"/><text x="12" y="16.5" textAnchor="middle" fontSize="9" fontWeight="900" fill="rgba(120,60,0,0.7)" fontFamily="Arial">$</text></svg>);}
+function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><linearGradient id="lpCoin" x1="15%" y1="0%" x2="85%" y2="100%"><stop offset="0%" stopColor="#fff176"/><stop offset="40%" stopColor="#ffd700"/><stop offset="100%" stopColor="#b8860b"/></linearGradient></defs><polygon points="12,1 19.5,4.5 23,12 19.5,19.5 12,23 4.5,19.5 1,12 4.5,4.5" fill="url(#lpCoin)" stroke="#c9940a" strokeWidth="0.7"/><polygon points="12,3.5 17.5,6.2 20,12 17.5,17.8 12,20.5 6.5,17.8 4,12 6.5,6.2" fill="rgba(255,248,120,0.2)"/><polygon points="9,8 15,8 17,12 15,16 9,16 7,12" fill="none" stroke="rgba(255,255,180,0.35)" strokeWidth="0.6"/><text x="12" y="15.8" textAnchor="middle" fontSize="7" fontWeight="900" fill="rgba(100,55,0,0.8)" fontFamily="Arial">$</text></svg>);}
 
-function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;return(
-  <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0}}>
-    <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient></defs>
-    {r.wings&&<><ellipse cx="9" cy="30" rx="9" ry="5" fill={r.sf} opacity=".75" transform="rotate(-25,9,30)"/><ellipse cx="51" cy="30" rx="9" ry="5" fill={r.sf} opacity=".75" transform="rotate(25,51,30)"/></>}
+function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;
+  // Aura intensity per base rank
+  const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:3,alpha:.2},bronze:{blur:5,alpha:.35},silver:{blur:6,alpha:.4},gold:{blur:9,alpha:.55},diamond:{blur:12,alpha:.65},plat:{blur:14,alpha:.75},solar:{blur:18,alpha:.9}};
+  const aura=auraMap[r.baseId]||{blur:3,alpha:.2};
+  return(
+  <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0,overflow:"visible"}}>
+    <defs>
+      <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient>
+      <filter id={fid} x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation={aura.blur} result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+    {/* Aura glow */}
+    <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+    {/* Wings for high ranks */}
+    {r.wings&&<>
+      <path d="M2,22 Q-8,28 -5,38 Q0,34 8,32" fill={r.sf} opacity=".6"/>
+      <path d="M2,28 Q-5,32 -3,38 Q2,35 7,35" fill={r.ss} opacity=".4"/>
+      <path d="M58,22 Q68,28 65,38 Q60,34 52,32" fill={r.sf} opacity=".6"/>
+      <path d="M58,28 Q65,32 63,38 Q58,35 53,35" fill={r.ss} opacity=".4"/>
+    </>}
+    {/* Main badge shape */}
     <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={`url(#${gid})`} stroke={r.si} strokeWidth="1.5"/>
-    <path d="M11 9 L49 9 L54 21 L54 38 L30 61 L6 38 L6 21 Z" fill={r.si} opacity="0.55"/>
-    <path d="M14 13 L46 13 L50 23 L50 36 L30 56 L10 36 L10 23 Z" fill={r.sf} opacity="0.2"/>
-    {r.nStars===1&&<text x="30" y="40" textAnchor="middle" fontSize="24" fill={r.ss} fontFamily="Arial">★</text>}
-    {r.nStars===2&&<><text x="21" y="41" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text><text x="39" y="41" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars===3&&<><text x="16" y="43" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text><text x="30" y="38" textAnchor="middle" fontSize="18" fill={r.ss} fontFamily="Arial">★</text><text x="44" y="43" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars>=4&&<text x="30" y="40" textAnchor="middle" fontSize="10" fill={r.ss} fontFamily="Arial" letterSpacing="1">{"★".repeat(r.nStars)}</text>}
-    {r.id==="solar"&&Array.from({length:8}).map((_,i)=>{const a=i*45*Math.PI/180;return <line key={i} x1={30+23*Math.cos(a)} y1={28+23*Math.sin(a)} x2={30+30*Math.cos(a)} y2={28+30*Math.sin(a)} stroke={r.ss} strokeWidth="1.8" opacity=".65"/>;})}
+    <path d="M11 9 L49 9 L54 21 L54 38 L30 61 L6 38 L6 21 Z" fill={r.si} opacity="0.5"/>
+    {/* Shine highlight */}
+    <path d="M14 9 L40 9 L44 17 L30 17 Z" fill="rgba(255,255,255,0.18)"/>
+    {/* Inner detail layer */}
+    {r.baseId==="bronze"&&<><path d="M16 15 L44 15 L48 25 L48 35 L30 54 L12 35 L12 25 Z" fill="none" stroke={r.ss} strokeWidth=".7" opacity=".6"/><path d="M22 20 L38 20 L41 27 L41 34 L30 46 L19 34 L19 27 Z" fill={r.sf} opacity=".12"/></>}
+    {r.baseId==="silver"&&<><path d="M15 14 L45 14 L49 24 L49 36 L30 55 L11 36 L11 24 Z" fill="none" stroke="rgba(200,220,240,0.5)" strokeWidth=".8"/><line x1="30" y1="14" x2="30" y2="55" stroke="rgba(255,255,255,0.1)" strokeWidth=".5"/></>}
+    {r.baseId==="gold"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="none" stroke={r.ss} strokeWidth=".8" opacity=".7"/>{[20,25,30].map(y=><line key={y} x1="12" y1={y} x2="48" y2={y} stroke="rgba(255,215,0,0.07)" strokeWidth=".6"/>)}</>}
+    {r.baseId==="diamond"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(136,220,255,0.08)" stroke="rgba(136,220,255,0.4)" strokeWidth=".7"/>{[[22,17,38,17],[14,28,46,28],[10,36,50,36]].map(([x1,y1,x2,y2],i)=><line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(136,220,255,0.12)" strokeWidth=".5"/>)}</>}
+    {r.baseId==="plat"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(206,147,216,0.1)" stroke="rgba(224,176,255,0.5)" strokeWidth=".8"/><circle cx="30" cy="35" r="8" fill="none" stroke="rgba(206,147,216,0.3)" strokeWidth=".7"/></>}
+    {/* Stars */}
+    {r.nStars===1&&<text x="30" y="42" textAnchor="middle" fontSize="24" fill={r.ss} fontFamily="Arial" style={{filter:`drop-shadow(0 0 3px ${r.ss})`}}>★</text>}
+    {r.nStars===2&&<><text x="21" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text><text x="39" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text></>}
+    {r.nStars===3&&<><text x="16" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text><text x="30" y="39" textAnchor="middle" fontSize="18" fill={r.ss} fontFamily="Arial">★</text><text x="44" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text></>}
+    {r.nStars>=4&&<text x="30" y="41" textAnchor="middle" fontSize="10" fill={r.ss} fontFamily="Arial" letterSpacing="1">{"★".repeat(r.nStars)}</text>}
+    {/* Solar rays */}
+    {r.id==="solar"&&<>
+      {Array.from({length:12}).map((_,i)=>{const a=i*30*Math.PI/180;const inner=i%2===0?22:24;const outer=i%2===0?30:27;return <line key={i} x1={30+inner*Math.cos(a)} y1={28+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={28+outer*Math.sin(a)} stroke={r.ss} strokeWidth={i%2===0?"1.8":"1"} opacity=".8"/>;})}
+      <circle cx="30" cy="28" r="7" fill={r.ss} opacity=".15"/>
+    </>}
   </svg>
 );}
 
-function ChestSVG({level,type,size=56}){const c={wood:{body:"#4a1e08",lid:"#7a3510",band:"#cd7f32",lock:"#e8a050"},gold:{body:"#6b4800",lid:"#aa7700",band:"#ffd700",lock:"#fff59d"},leg:{body:"#1a0030",lid:"#3d0070",band:"#9b00ff",lock:"#cc88ff"}}[level]||{body:"#333",lid:"#555",band:"#888",lock:"#aaa"};const tc=type==="theme"?"#4ecdc4":"#ff9966";return(<svg width={size} height={size} viewBox="0 0 60 60"><rect x="4" y="30" width="52" height="22" rx="4" fill={c.body} stroke={c.band} strokeWidth="1.5"/><path d="M4 20 Q4 12 30 12 Q56 12 56 20 L56 32 L4 32 Z" fill={c.lid} stroke={c.band} strokeWidth="1.5"/><rect x="4" y="30" width="52" height="4" fill={c.band} opacity=".65"/><rect x="25" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="31" y="12" width="3.5" height="40" fill={c.band} opacity=".2"/><rect x="22" y="33" width="16" height="10" rx="2" fill={c.band}/><circle cx="30" cy="37" r="3" fill={c.lock}/><ellipse cx="18" cy="18" rx="8" ry="3.5" fill="rgba(255,255,255,.18)"/><text x="30" y="27" textAnchor="middle" fontSize="9" fill={tc} fontWeight="900" fontFamily="Arial">{type==="theme"?"DA":"SK"}</text></svg>);}
+function ChestSVG({level,type,size=56}){
+  const c={wood:{body:"#4a1e08",lid:"#7a3510",band:"#cd7f32",lock:"#e8a050",glow:"none"},gold:{body:"#7a5000",lid:"#c08000",band:"#ffd700",lock:"#fff8aa",glow:"#ffd70066"},leg:{body:"#180028",lid:"#380060",band:"#aa00ff",lock:"#dd88ff",glow:"#9900ff88"}}[level]||{body:"#333",lid:"#555",band:"#888",lock:"#aaa",glow:"none"};
+  const scale=level==="gold"?1.08:level==="leg"?1.18:1;
+  const sz=size*scale;const off=(sz-size)/2;
+  const isSkin=type==="skin";
+  return(<svg width={size} height={size} viewBox={`${-off} ${-off} ${sz} ${sz}`}>
+    {/* Glow for gold/leg */}
+    {c.glow!=="none"&&<ellipse cx="30" cy="46" rx={level==="leg"?26:20} ry={level==="leg"?8:5} fill={c.glow} opacity=".5"/>}
+    {/* Body */}
+    <rect x="4" y="30" width="52" height="22" rx="4" fill={c.body} stroke={c.band} strokeWidth={level==="leg"?"2":"1.5"}/>
+    {/* Lid */}
+    <path d="M4 20 Q4 12 30 12 Q56 12 56 20 L56 32 L4 32 Z" fill={c.lid} stroke={c.band} strokeWidth={level==="leg"?"2":"1.5"}/>
+    {/* Band stripe */}
+    <rect x="4" y="30" width="52" height="4" fill={c.band} opacity=".7"/>
+    {/* Vertical bands */}
+    <rect x="25.5" y="12" width="3" height="40" fill={c.band} opacity=".22"/>
+    <rect x="31.5" y="12" width="3" height="40" fill={c.band} opacity=".22"/>
+    {/* Lock plate */}
+    <rect x="21" y="32" width="18" height="12" rx="3" fill={c.band}/>
+    <circle cx="30" cy="37" r="3.5" fill={c.lock}/>
+    {/* Shine highlight */}
+    <ellipse cx="17" cy="18" rx="9" ry="4" fill="rgba(255,255,255,.15)"/>
+    {/* Type icon: card symbol for skins, palette for themes */}
+    {isSkin?<>
+      <rect x="18" y="19" width="8" height="6" rx="1" fill="none" stroke={c.lock} strokeWidth=".9" opacity=".8"/>
+      <rect x="21" y="21" width="5" height="4" rx=".5" fill={c.lock} opacity=".5"/>
+      <rect x="27" y="20" width="6" height="5" rx="1" fill="none" stroke={c.lock} strokeWidth=".9" opacity=".6"/>
+    </>:<>
+      <circle cx="22" cy="21" r="2.5" fill="#ff8888" opacity=".8"/>
+      <circle cx="28" cy="19" r="2.5" fill="#88ff88" opacity=".8"/>
+      <circle cx="34" cy="21" r="2.5" fill="#8888ff" opacity=".8"/>
+    </>}
+    {/* Legendary extra glow rings */}
+    {level==="leg"&&<><path d="M4 30 L4 20 Q4 12 30 12 Q56 12 56 20 L56 30" fill="none" stroke={c.band} strokeWidth=".7" opacity=".5" strokeDasharray="3,2"/><circle cx="30" cy="37" r="6" fill="none" stroke={c.lock} strokeWidth=".6" opacity=".4"/></>}
+    {/* Gold extra detail */}
+    {level==="gold"&&<><line x1="4" y1="28" x2="56" y2="28" stroke={c.band} strokeWidth=".5" opacity=".35"/>{[10,18,42,50].map(x=><circle key={x} cx={x} cy={30} r="1.5" fill={c.lock} opacity=".6"/>)}</>}
+  </svg>);}
 
 
 function ThemeIcon({k,th,size=36}){
@@ -152,98 +260,130 @@ function ThemeIcon({k,th,size=36}){
 }
 
 function StreakBorderFlames({streak}){
-  const flames=useMemo(()=>{
-    if(streak<5)return[];
-    const t=Math.min(1,streak/100);
-    const n=Math.floor(6+t*22);
-    return Array.from({length:n},(_,i)=>{
-      const sd=((i*1664525)^(streak*31337))>>>0;
-      const r1=(sd&0xfff)/0xfff,r2=((sd>>12)&0xfff)/0xfff,r3=((sd>>24)&0xff)/0xff;
-      const side=streak>=50?(i%3===0?1:i%3===1?2:0):0;
-      return{x:5+r1*90,h:Math.round(38+t*(45+r2*200)),w:Math.round(18+t*16),dur:0.45+r3*0.9,delay:r1*1.8,side,idx:i};
-    });
-  },[streak]);
+  const cvs=useRef<HTMLCanvasElement>(null);
+  const pts=useRef<any[]>([]);
+  const af=useRef<number>(0);
+  const streakRef=useRef(streak);
+  useEffect(()=>{streakRef.current=streak;},[streak]);
+
+  useEffect(()=>{
+    const c=cvs.current;if(!c)return;
+    const ctx=c.getContext("2d");if(!ctx)return;
+
+    const resize=()=>{c.width=c.offsetWidth||320;c.height=c.offsetHeight||500;};
+    resize();
+    const ro=new ResizeObserver(resize);ro.observe(c);
+
+    // colour palette evolves with streak
+    // <10: yellow/small  10-30: orange  30-70: red/orange  70-150: red  150+: deep red/crimson
+    const getColor=(life:number,maxLife:number,sk:number)=>{
+      const a=life/maxLife;
+      if(sk<10) return `rgba(255,220,40,${a*.7})`;
+      if(sk<30) return `rgba(255,${Math.round(160-a*60)},0,${a*.8})`;
+      if(sk<70) return `rgba(255,${Math.round(80-a*40)},0,${a*.85})`;
+      if(sk<150) return `rgba(230,${Math.round(30-a*20)},0,${a*.9})`;
+      return `rgba(${Math.round(180+a*40)},0,0,${a*.95})`;
+    };
+
+    const spawnParticle=(sk:number,W:number,H:number)=>{
+      const t=Math.min(1,sk/120);
+      // side: 0=bottom, 1=left, 2=right (unlocked at higher streaks)
+      const sides=sk<20?[0]:sk<50?[0,0,0,1,2]:[0,0,1,1,2,2];
+      const side=sides[Math.floor(Math.random()*sides.length)];
+      let x,y,vx,vy;
+      if(side===0){x=Math.random()*W;y=H;vx=(Math.random()-.5)*(.8+t*1.4);vy=-(1.2+Math.random()*(1.5+t*3.5));}
+      else if(side===1){x=0;y=Math.random()*H*.7+H*.15;vx=.5+Math.random()*(1+t*2);vy=-(0.5+Math.random()*(1+t*2));}
+      else{x=W;y=Math.random()*H*.7+H*.15;vx=-(0.5+Math.random()*(1+t*2));vy=-(0.5+Math.random()*(1+t*2));}
+      const r=2+t*(6+Math.random()*8);
+      const life=18+Math.random()*(20+t*30);
+      return{x,y,vx,vy,r,life,maxLife:life,side};
+    };
+
+    const maxPts=Math.min(8+Math.floor(streak/5),60);
+    let frame=0;
+
+    const draw=()=>{
+      const sk=streakRef.current;
+      if(sk<5){ctx.clearRect(0,0,c.width,c.height);af.current=requestAnimationFrame(draw);return;}
+      const W=c.width,H=c.height;
+      // Spawn
+      if(frame%2===0&&pts.current.length<maxPts){
+        const n=Math.min(2,maxPts-pts.current.length);
+        for(let i=0;i<n;i++)pts.current.push(spawnParticle(sk,W,H));
+      }
+      ctx.clearRect(0,0,W,H);
+      // Vignette for high streaks
+      if(sk>=60){
+        const t2=Math.min(1,(sk-60)/200);
+        const g=ctx.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.75);
+        g.addColorStop(0,"transparent");
+        g.addColorStop(1,`rgba(180,0,0,${t2*.45})`);
+        ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+      }
+      // Particles
+      pts.current=pts.current.filter(p=>{
+        p.x+=p.vx;p.y+=p.vy;p.life--;
+        p.vx*=.98;p.r=Math.max(.5,p.r*.995);
+        if(p.life<=0)return false;
+        const t3=Math.min(1,sk/120);
+        const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*(1.5+t3));
+        grd.addColorStop(0,getColor(p.life,p.maxLife,sk));
+        grd.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r*(2+t3*.8),0,Math.PI*2);
+        ctx.fillStyle=grd;ctx.fill();
+        return true;
+      });
+      frame++;
+      af.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>{cancelAnimationFrame(af.current);ro.disconnect();};
+  },[]);
+
   if(streak<5)return null;
-  const t=Math.min(1,streak/100),si=Math.min(1,streak/500);
-  const c1=streak<15?"#e67e22":streak<50?"#e74c3c":streak<200?"#c0392b":"#8e44ad";
-  const c2=streak<15?"#f39c12":streak<50?"#e74c3c":streak<200?"#e74c3c":"#c0392b";
-  const c3=streak<100?"#ffe100":"#ff4400";
-  const vig=streak>=100?`radial-gradient(ellipse at center,transparent ${Math.round(88-si*45)}%,rgba(${streak>=500?"120,0,60":"180,0,0"},${(si*.65).toFixed(2)}) 100%)`:null;
-  return(
-    <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:10,overflow:"hidden"}}>
-      {vig&&<div style={{position:"absolute",inset:0,background:vig,zIndex:2}}/>}
-      {flames.map((f)=>{
-        const base={position:"absolute" as const,width:f.w,height:f.h,zIndex:1,animation:`flameRise ${f.dur}s ${f.delay}s ease-in-out infinite alternate`};
-        const pos=f.side===0?{bottom:0,left:`${f.x}%`}:f.side===1?{left:0,bottom:`${f.x}%`,transform:`rotate(90deg) translateY(-${f.w}px)`,transformOrigin:"bottom left"}:{right:0,bottom:`${f.x}%`,transform:`rotate(-90deg) translateY(${f.w}px)`,transformOrigin:"bottom right"};
-        return(
-          <div key={f.idx} style={{...base,...pos}}>
-            <svg width="100%" height="100%" viewBox="0 0 20 60" preserveAspectRatio="none">
-              <path d={`M10,1C${8+f.idx%3},${12+f.idx%6}${4+f.idx%4},${24+f.idx%8}5,38C5,50,8,56,10,58C12,56,15,50,15,38C${16+f.idx%4},${24+f.idx%8}${12+f.idx%3},${12+f.idx%6}10,1Z`} fill={c1} opacity={0.55+si*0.35}/>
-              <path d="M10,20C9,30,7,42,8,50C9,55,10,57,10,58C10,57,11,55,12,50C13,42,11,30,10,20Z" fill={c2} opacity={0.75+si*0.2}/>
-              <path d="M10,40C9.5,48,10,55,10,58C10,55,10.5,48,10,40Z" fill={c3} opacity={0.88+si*0.1}/>
-            </svg>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <canvas ref={cvs} style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:10}}/>;
 }
 
 function Flame({streak}){if(!streak)return <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}><span style={{fontSize:22,opacity:.2}}>🔥</span><span style={{color:"#333",fontSize:13,fontWeight:700}}>0</span></div>;const t=Math.min(1,streak/100),sz=22+t*28,ns=14+t*14;const cols=streak<5?["#f39c12","#e67e22"]:streak<15?["#e74c3c","#f39c12"]:streak<40?["#c0392b","#e74c3c","#f39c12","#ffe100"]:["#8e44ad","#c0392b","#e74c3c","#f39c12","#fff"];return(<div style={{display:"flex",flexDirection:"column",alignItems:"center",lineHeight:1,gap:1}}><span style={{fontSize:sz,lineHeight:1,filter:`drop-shadow(0 0 ${4+t*12}px ${cols[0]})`,transition:"all .3s",animation:streak>=5?"flamePulse .7s ease infinite alternate":"none"}}>🔥</span><span style={{fontSize:ns,fontWeight:900,background:`linear-gradient(180deg,${cols.join(",")})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:`drop-shadow(0 0 ${2+t*6}px ${cols[0]})`,transition:"all .3s",letterSpacing:-1}}>{streak}</span></div>);}
 function ScoreBadge({raw,size=42,perfect=false}){const sc=getScore(raw),c=noteCol(sc);return(<div style={{width:size,height:size,borderRadius:"50%",border:`2.5px solid ${c}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0,background:perfect?`radial-gradient(circle,${c}22,transparent)`:`${c}11`,boxShadow:perfect?`0 0 20px ${c},0 0 40px ${c}55`:`0 0 8px ${c}44`,transition:"all .4s"}}><span style={{color:c,fontSize:size*.26,fontWeight:800,lineHeight:1}}>{sc!==null?sc.toFixed(1):"–"}</span><span style={{color:c,fontSize:size*.18,lineHeight:1,opacity:.7}}>/10</span></div>);}
-function ProgressHeader({ls,T}){const{rank,xIn,xNeed,isMax,pct,nextRank}=getRankInfo(ls.xp||0);const segs=20,filled=Math.round(pct/100*segs);return(<div style={{padding:"7px 12px",background:"rgba(0,0,0,0.35)",borderBottom:`1px solid ${T.brd}`,flexShrink:0}}><div style={{display:"flex",alignItems:"center",gap:10}}><RankBadge rank={rank} size={44}/><div style={{flex:1,minWidth:0}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{color:rank.col,fontSize:13,fontWeight:900,textShadow:`0 0 10px ${rank.col}88`}}>{rank.l}</span><span style={{color:"rgba(255,255,255,.5)",fontSize:10,fontWeight:700}}>{isMax?"MAX ∞":`${xIn} / ${xNeed} XP`}</span></div><div style={{display:"flex",gap:2,padding:"2px",background:"rgba(0,0,0,0.3)",borderRadius:6}}>{Array.from({length:segs}).map((_,i)=>(<div key={i} style={{flex:1,height:10,borderRadius:2,background:i<filled?rank.col:"rgba(255,255,255,0.05)",boxShadow:i<filled?`0 0 4px ${rank.glow}`:"none",transition:"background .4s"}}/>))}</div></div>{nextRank&&<RankBadge rank={nextRank} size={24} opacity={.35}/>}<div style={{display:"flex",alignItems:"center",gap:3,flexShrink:0}}><CoinIcon size={14}/><span style={{color:"#ffd700",fontSize:11,fontWeight:700}}>{ls.coins||0}</span></div></div></div>);}
+function ProgressHeader({ls,T}){const{rank,xIn,xNeed,isMax,pct,nextRank}=getRankInfo(ls.xp||0);const segs=20,filled=Math.round(pct/100*segs);return(<div style={{padding:"7px 12px",background:"rgba(0,0,0,0.35)",borderBottom:`1px solid ${T.brd}`,flexShrink:0}}><div style={{display:"flex",alignItems:"center",gap:10}}><RankBadge rank={rank} size={44}/><div style={{flex:1,minWidth:0}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{color:rank.col,fontSize:13,fontWeight:900,textShadow:`0 0 10px ${rank.col}88`}}>{rank.l}</span><span style={{color:"rgba(255,255,255,.5)",fontSize:10,fontWeight:700}}>{isMax?"MAX ∞":`${xIn} / ${xNeed} XP`}</span></div><div style={{display:"flex",gap:2,padding:"2px",background:"rgba(0,0,0,0.3)",borderRadius:6}}>{Array.from({length:segs}).map((_,i)=>(<div key={i} style={{flex:1,height:10,borderRadius:2,background:i<filled?rank.col:"rgba(255,255,255,0.05)",boxShadow:i<filled?`0 0 4px ${rank.glow}`:"none",transition:"background .4s"}}/>))}</div></div>{nextRank&&<RankBadge rank={nextRank} size={24} opacity={.35}/>}<div style={{display:"flex",alignItems:"center",gap:3,flexShrink:0}}><CoinIcon size={14}/><span style={{color:"#ffd700",fontSize:11,fontWeight:700}}>{fmtCoins(ls.coins||0)}</span></div></div></div>);}
 function Particles(){const cvs=useRef(null);useEffect(()=>{const c=cvs.current;if(!c)return;const ctx=c.getContext("2d");const pts=Array.from({length:28},()=>({x:Math.random()*600,y:Math.random()*800,r:.8+Math.random()*1.8,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,col:Math.random()<.5?`rgba(${180+~~(Math.random()*75)},0,60,`:`rgba(100,0,${160+~~(Math.random()*95)},`,a:.3+Math.random()*.5}));let af;const draw=()=>{c.width=c.offsetWidth||300;c.height=c.offsetHeight||600;ctx.clearRect(0,0,c.width,c.height);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>c.width)p.vx*=-1;if(p.y<0||p.y>c.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.col+p.a+")";ctx.fill();});af=requestAnimationFrame(draw);};draw();return()=>cancelAnimationFrame(af);},[]);return <canvas ref={cvs} style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}}/>;}
 
 // ── ROULETTE LOOT ─────────────────────────────────────────────────────────
 function RouletteOpening({box,wonItem,onClose,alreadyOwned=false}){
-  const [phase,setPhase]=useState("spin"); // spin | bounce | reveal
+  const [phase,setPhase]=useState<"spin"|"bounce"|"overshoot"|"reveal">("spin");
   const [spinPos,setSpinPos]=useState(0);
-  const [finalIdx,setFinalIdx]=useState(0);
-  const tickRef=useRef(null);
-  const ITEM_W=88, VISIBLE=5, CENTER=Math.floor(VISIBLE/2);
+  const ITEM_W=92, VISIBLE=5, CENTER=Math.floor(VISIBLE/2);
 
-  // Build extended reel: repeat pool several times + land on won item
   const reel=useMemo(()=>{
-    const base=[...box.pool,...box.pool,...box.pool,...box.pool];
-    // ensure wonItem is at a specific index near end
-    const landIdx=base.length+1;
-    const extended=[...base,wonItem,...box.pool];
-    return extended;
-  },[box]);
+    // 5 full laps of pool, then land item at a predictable spot
+    const base=[...box.pool,...box.pool,...box.pool,...box.pool,...box.pool];
+    const landIdx=base.length;
+    return[...base,wonItem,...box.pool];
+  },[box,wonItem]);
 
   const landIndex=useMemo(()=>{
-    // find last occurrence of wonItem id
     for(let i=reel.length-1;i>=0;i--){if(reel[i].id===wonItem.id)return i;}
     return reel.length-1;
   },[reel,wonItem]);
 
+  const targetPos=landIndex*ITEM_W;
+
   useEffect(()=>{
     SFX.loot();
-    let speed=18, pos=0, ticks=0;
-    const totalTicks=60+Math.floor(Math.random()*20);
-    const targetPos=landIndex*ITEM_W;
-    const interval=setInterval(()=>{
-      ticks++;
-      const progress=ticks/totalTicks;
-      // ease out
-      const easedSpeed=speed*Math.pow(1-progress,2.2);
-      pos+=Math.max(1,easedSpeed);
-      if(ticks%Math.max(1,Math.floor(easedSpeed/3))===0)SFX.rTick(progress);
-      setSpinPos(pos);
-      if(ticks>=totalTicks){
-        clearInterval(interval);
-        setSpinPos(targetPos);
-        setPhase("bounce");
-        const rarSfx:{[k:string]:()=>void}={commun:SFX.lootC,rare:SFX.lootR,super_rare:SFX.lootSR,epique:SFX.lootE,legendaire:SFX.lootL,secret:SFX.lootS};
-        setTimeout(()=>{(rarSfx[wonItem.rar]||SFX.lootC)();setPhase("reveal");},350);
-      }
-    },30);
-    tickRef.current=interval;
-    return()=>clearInterval(interval);
+    // Brief pause then trigger the CSS transition
+    const t1=setTimeout(()=>{setSpinPos(targetPos);setPhase("spin");},80);
+    // After main spin (3.8s), do overshoot bounce
+    const t2=setTimeout(()=>{setSpinPos(targetPos+18);setPhase("overshoot");},3900);
+    const t3=setTimeout(()=>{setSpinPos(targetPos);setPhase("bounce");},4080);
+    // Reveal after settle
+    const t4=setTimeout(()=>{const rarSfx:{[k:string]:()=>void}={commun:SFX.lootC,rare:SFX.lootR,super_rare:SFX.lootSR,epique:SFX.lootE,legendaire:SFX.lootL,secret:SFX.lootS};(rarSfx[wonItem.rar]||SFX.lootC)();setPhase("reveal");},4350);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4);};
   },[]);
 
+  const spinTransition=phase==="spin"?"transform 3.8s cubic-bezier(0.02,0.6,0.3,1)":phase==="overshoot"?"transform 0.18s ease-out":phase==="bounce"?"transform 0.22s cubic-bezier(.4,2,.5,1)":"none";
+
   const rar=RARITY[wonItem.rar]||RARITY.commun;
-  const isSecret=wonItem.secret&&phase!=="reveal";
   const displayName=wonItem.secret?(phase==="reveal"?wonItem.name:"???"):wonItem.name;
   const displayRar=wonItem.secret?(phase==="reveal"?rar:RARITY.secret):rar;
 
@@ -251,25 +391,24 @@ function RouletteOpening({box,wonItem,onClose,alreadyOwned=false}){
     <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.97)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:250,flexDirection:"column",gap:14,padding:24}}>
       <div style={{color:"#fff",fontSize:15,fontWeight:700,marginBottom:2}}>{box.label}</div>
       {/* Roulette track */}
-      <div style={{position:"relative",width:ITEM_W*VISIBLE,height:96,overflow:"hidden",borderRadius:12,border:`2px solid ${box.col}`,background:"rgba(0,0,0,0.5)"}}>
-        {/* Center highlight */}
+      <div style={{position:"relative",width:ITEM_W*VISIBLE,maxWidth:"100%",height:104,overflow:"hidden",borderRadius:12,border:`2px solid ${box.col}`,background:"rgba(0,0,0,0.5)"}}>
         <div style={{position:"absolute",left:ITEM_W*CENTER,top:0,width:ITEM_W,height:"100%",background:`${box.col}22`,border:`2px solid ${box.col}`,zIndex:2,pointerEvents:"none",borderRadius:4}}/>
-        {/* Left/right fades */}
-        <div style={{position:"absolute",left:0,top:0,width:60,height:"100%",background:"linear-gradient(90deg,rgba(0,0,0,0.8),transparent)",zIndex:3,pointerEvents:"none"}}/>
-        <div style={{position:"absolute",right:0,top:0,width:60,height:"100%",background:"linear-gradient(-90deg,rgba(0,0,0,0.8),transparent)",zIndex:3,pointerEvents:"none"}}/>
-        {/* Scrolling items */}
-        <div style={{display:"flex",alignItems:"center",height:"100%",transform:`translateX(${-(spinPos%(reel.length*ITEM_W))+ITEM_W*CENTER}px)`,transition:phase==="bounce"?"transform 0.25s cubic-bezier(.4,2,.6,1)":"none",willChange:"transform"}}>
-          {[...reel,...reel].map((item,i)=>{
+        <div style={{position:"absolute",left:0,top:0,width:55,height:"100%",background:"linear-gradient(90deg,rgba(0,0,0,0.85),transparent)",zIndex:3,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",right:0,top:0,width:55,height:"100%",background:"linear-gradient(-90deg,rgba(0,0,0,0.85),transparent)",zIndex:3,pointerEvents:"none"}}/>
+        <div style={{display:"flex",alignItems:"center",height:"100%",transform:`translateX(${-spinPos+ITEM_W*CENTER}px)`,transition:spinTransition,willChange:"transform"}}>
+          {reel.map((item,i)=>{
             const r2=RARITY[item.rar]||RARITY.commun;
             return(
-              <div key={i} style={{width:ITEM_W,flexShrink:0,height:84,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-                {item.secret?
-                  <div style={{width:44,height:44,borderRadius:8,background:"#0a0a0a",border:`1.5px solid ${r2.col}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:22,color:r2.col,fontWeight:900}}>?</span></div>
-                  :box.type==="skin"?(()=>{const sk=SKINS[item.id.replace("skin_","")]||SKINS.default;const Ovl=sk.ovl?SK_OVLS[sk.ovl]:null;return(<div style={{width:44,height:44,borderRadius:8,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,border:`1.5px solid ${r2.col}`,overflow:"hidden",position:"relative",flexShrink:0}}>{Ovl&&<Ovl/>}</div>);})()
-                  :(()=>{const thk=item.id.replace("theme_","");const th=THEMES[thk]||THEMES.default;return<ThemeIcon k={thk} th={th} size={44}/>;})()
-                }
-                <span style={{fontSize:9,color:r2.col,fontWeight:700,textAlign:"center",maxWidth:82,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.secret?"???":item.name}</span>
-                <span style={{fontSize:8,color:"rgba(255,255,255,.45)",fontWeight:600}}>{item.secret?"?%":Math.round(item.p*100)+"%"}</span>
+              <div key={i} style={{width:ITEM_W,flexShrink:0,height:100,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"4px 6px",gap:3}}>
+                <div style={{flexShrink:0}}>
+                  {item.secret?
+                    <div style={{width:44,height:44,borderRadius:8,background:"#0a0a0a",border:`1.5px solid ${r2.col}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:22,color:r2.col,fontWeight:900}}>?</span></div>
+                    :box.type==="skin"?(()=>{const sk=SKINS[item.id.replace("skin_","")]||SKINS.default;const Ovl2=sk.ovl?SK_OVLS[sk.ovl]:null;return(<div style={{width:44,height:44,borderRadius:8,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,border:`1.5px solid ${r2.col}`,overflow:"hidden",position:"relative",flexShrink:0}}>{Ovl2&&<Ovl2/>}</div>);})()
+                    :(()=>{const thk=item.id.replace("theme_","");const th=THEMES[thk]||THEMES.default;return<ThemeIcon k={thk} th={th} size={44}/>;})()
+                  }
+                </div>
+                <span style={{fontSize:9,color:r2.col,fontWeight:700,textAlign:"center",width:"100%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",lineHeight:1.2}}>{item.secret?"???":item.name}</span>
+                <span style={{fontSize:8,color:"rgba(255,255,255,.4)",fontWeight:600,lineHeight:1}}>{item.secret?"?%":`${(item.p*100).toFixed(1)}%`}</span>
               </div>
             );
           })}
@@ -279,15 +418,15 @@ function RouletteOpening({box,wonItem,onClose,alreadyOwned=false}){
       {phase==="reveal"&&(
         <div style={{textAlign:"center",animation:"popIn .5s ease"}}>
           <div style={{fontSize:11,color:displayRar.col,marginBottom:5,letterSpacing:2,textTransform:"uppercase",fontWeight:700}}>{displayRar.l}</div>
-          <div style={{fontSize:26,fontWeight:900,color:"#fff",marginBottom:3,textShadow:`0 0 20px ${displayRar.col}`}}>{displayName}</div>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:14}}>
-            <span style={{fontSize:11,color:displayRar.col,fontWeight:700,background:`${displayRar.col}18`,border:`1px solid ${displayRar.col}44`,borderRadius:6,padding:"2px 8px"}}>Probabilité {Math.round(wonItem.p*100)}%</span>
-            <span style={{fontSize:11,fontWeight:700,color:alreadyOwned?"#f39c12":"#27ae60",background:alreadyOwned?"rgba(243,156,18,.12)":"rgba(39,174,96,.12)",border:`1px solid ${alreadyOwned?"rgba(243,156,18,.35)":"rgba(39,174,96,.35)"}`,borderRadius:6,padding:"2px 8px"}}>{alreadyOwned?"Déjà possédé":"Nouveau ! 🎉"}</span>
+          <div style={{fontSize:24,fontWeight:900,color:"#fff",marginBottom:8,textShadow:`0 0 20px ${displayRar.col}`}}>{displayName}</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:14}}>
+            <span style={{fontSize:11,color:displayRar.col,fontWeight:700,background:`${displayRar.col}18`,border:`1px solid ${displayRar.col}44`,borderRadius:6,padding:"3px 9px"}}>Prob. {(wonItem.p*100).toFixed(1)}%</span>
+            <span style={{fontSize:11,fontWeight:700,color:alreadyOwned?"#f39c12":"#27ae60",background:alreadyOwned?"rgba(243,156,18,.12)":"rgba(39,174,96,.12)",border:`1px solid ${alreadyOwned?"rgba(243,156,18,.35)":"rgba(39,174,96,.35)"}`,borderRadius:6,padding:"3px 9px"}}>{alreadyOwned?"Déjà possédé":"Nouveau ! 🎉"}</span>
           </div>
           <button onClick={onClose} style={{background:`linear-gradient(135deg,${box.col},${box.col}88)`,color:"#fff",border:"none",borderRadius:12,padding:"11px 26px",cursor:"pointer",fontWeight:700,fontSize:14}}>Super !</button>
         </div>
       )}
-      {phase!=="reveal"&&<div style={{color:"rgba(255,255,255,.4)",fontSize:12}}>Bonne chance...</div>}
+      {phase!=="reveal"&&<div style={{color:"rgba(255,255,255,.4)",fontSize:12,marginTop:4}}>Bonne chance… 🤞</div>}
     </div>
   );
 }
@@ -307,9 +446,9 @@ function SkinCard({skinKey,children,style={}}){
 // ── MILESTONES ────────────────────────────────────────────────────────────
 const MILESTONES=[10,30,50,100,200,300,400,500,1000];
 const M_MSG={10:"En feu !",30:"Inarrêtable !",50:"Série folle !",100:"100 streak !",200:"Machine !",300:"Expert !",400:"Légendaire !",500:"Titan !",1000:"MYTHIQUE !"};
-function MilestonePopup({count,onClose}){useEffect(()=>{SFX.milestone();const t=setTimeout(onClose,2500);return()=>clearTimeout(t);},[]);const t=Math.min(1,count/1000);const col=t<.15?"#f39c12":t<.5?"#e74c3c":"#8e44ad";return(<div style={{position:"absolute",top:"42%",left:"50%",transform:"translate(-50%,-50%)",zIndex:150,pointerEvents:"none",animation:"milAnim 2.5s ease forwards"}}><div style={{background:"linear-gradient(135deg,#0d0d1a,#1a0a2e)",border:`2px solid ${col}`,borderRadius:20,padding:"14px 26px",textAlign:"center",boxShadow:`0 0 40px ${col}88`}}><div style={{fontSize:28}}>🔥</div><div style={{fontSize:17,fontWeight:900,color:col}}>{M_MSG[count]||count+"!"}</div><div style={{color:"rgba(255,255,255,.4)",fontSize:11}}>Streak {count}</div></div></div>);}
+function MilestonePopup({count,onClose}){useEffect(()=>{SFX.milestone();const t=setTimeout(onClose,2800);return()=>clearTimeout(t);},[]);const t=Math.min(1,count/1000);const col=t<.1?"#f39c12":t<.3?"#e67e22":t<.6?"#e74c3c":"#9b59b6";const col2=t<.1?"#e67e22":t<.3?"#e74c3c":t<.6?"#c0392b":"#6c3483";return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:150,pointerEvents:"none",animation:"fadeIn .2s ease"}}><div style={{background:`linear-gradient(135deg,#0a0008,#140015)`,border:`2px solid ${col}`,borderRadius:24,padding:"28px 32px",textAlign:"center",boxShadow:`0 0 60px ${col}99,0 0 120px ${col}44`,animation:"popIn .4s cubic-bezier(.2,1.4,.4,1)",maxWidth:260,width:"90%"}}><div style={{fontSize:52,lineHeight:1,filter:`drop-shadow(0 0 18px ${col})`,marginBottom:10}}>🔥</div><div style={{fontSize:22,fontWeight:900,background:`linear-gradient(135deg,${col},${col2})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:4,letterSpacing:-0.5}}>{M_MSG[count]||`${count} streak !`}</div><div style={{background:`linear-gradient(90deg,${col}33,${col}66,${col}33)`,borderRadius:8,padding:"4px 14px",display:"inline-block"}}><span style={{color:"rgba(255,255,255,.8)",fontSize:12,fontWeight:700}}>Streak </span><span style={{color:col,fontSize:14,fontWeight:900}}>{count}</span></div></div></div>);}
 function PlatinumPopup({lang,onContinue,onMenu}){useEffect(()=>SFX.platinum(),[]);return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.92)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300,padding:20}}><div style={{background:"linear-gradient(135deg,#0d0d1a,#1a0a2e)",border:"2px solid #a855f7",borderRadius:26,padding:"30px 22px",textAlign:"center",maxWidth:280,width:"100%",boxShadow:"0 0 60px #a855f799"}}><div style={{fontSize:60,filter:"drop-shadow(0 0 18px #a855f7)"}}>🏆</div><div style={{fontSize:20,fontWeight:900,color:"#a855f7",marginBottom:4}}>TROPHÉE PLATINE</div><div style={{color:"#e0d7ff",fontSize:14,marginBottom:4}}>{LANG_INFO[lang]?.label} 100% !</div><div style={{color:"rgba(255,255,255,.35)",fontSize:12,marginBottom:18}}>Tous les mots à 10/10.</div><div style={{display:"flex",gap:10,justifyContent:"center"}}><button onClick={onContinue} style={{background:"linear-gradient(135deg,#a855f7,#7c3aed)",color:"#fff",border:"none",borderRadius:12,padding:"10px 18px",cursor:"pointer",fontWeight:700,fontSize:13}}>Continuer</button><button onClick={onMenu} style={{background:"rgba(255,255,255,0.08)",color:"rgba(255,255,255,.6)",border:"none",borderRadius:12,padding:"10px 18px",cursor:"pointer",fontSize:13}}>Menu</button></div></div></div>);}
-function RankUpPopup({rank,onClose}){useEffect(()=>{SFX.rankup();const t=setTimeout(onClose,2800);return()=>clearTimeout(t);},[]);return(<div style={{position:"absolute",top:"38%",left:"50%",transform:"translate(-50%,-50%)",zIndex:160,pointerEvents:"none",animation:"milAnim 2.8s ease forwards"}}><div style={{background:"linear-gradient(135deg,#0d0d1a,#1a0a2e)",border:`2px solid ${rank.col}`,borderRadius:20,padding:"16px 28px",textAlign:"center",boxShadow:`0 0 40px ${rank.col}88`}}><RankBadge rank={rank} size={60}/><div style={{color:rank.col,fontWeight:900,fontSize:17,marginTop:6}}>Rang {rank.l} !</div></div></div>);}
+function RankUpPopup({rank,coinsAwarded=0,onClose}:{rank:any,coinsAwarded?:number,onClose:()=>void}){useEffect(()=>{SFX.rankup();},[]);return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.82)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:160,padding:20}} onClick={onClose}><div style={{background:`linear-gradient(135deg,#080012,#120020)`,border:`2px solid ${rank.col}`,borderRadius:26,padding:"28px 24px",textAlign:"center",boxShadow:`0 0 80px ${rank.col}88,0 0 160px ${rank.col}33`,animation:"popIn .5s cubic-bezier(.2,1.4,.4,1)",maxWidth:280,width:"100%"}} onClick={e=>e.stopPropagation()}><div style={{fontSize:12,color:"rgba(255,255,255,.4)",letterSpacing:2,textTransform:"uppercase",marginBottom:12}}>Promotion de rang !</div><div style={{display:"flex",justifyContent:"center",marginBottom:12}}><RankBadge rank={rank} size={72}/></div><div style={{fontSize:22,fontWeight:900,color:rank.col,marginBottom:4,textShadow:`0 0 20px ${rank.col}`}}>{rank.l}</div>{coinsAwarded>0&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:"rgba(255,215,0,0.1)",border:"1px solid rgba(255,215,0,0.25)",borderRadius:10,padding:"6px 14px",margin:"10px auto",width:"fit-content"}}><CoinIcon size={14}/><span style={{color:"#ffd700",fontWeight:800,fontSize:14}}>+{fmtCoins(coinsAwarded)}</span></div>}<button onClick={onClose} style={{marginTop:14,background:`linear-gradient(135deg,${rank.col},${rank.col}99)`,color:"#000",border:"none",borderRadius:12,padding:"10px 28px",cursor:"pointer",fontWeight:800,fontSize:14}}>Super ! 🎉</button></div></div>);}
 function FocusEntryPopup({onStart,onClose,rs,words}){const [thresh,setThresh]=useState(3);const elig=words.filter(([w])=>{const r=rs[w];return r!==undefined&&r!==null&&r<thresh*10;});return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,padding:20}}><div style={{background:"linear-gradient(135deg,#0a0010,#1a0020)",border:"2px solid #9b59b6",borderRadius:22,padding:"24px 20px",maxWidth:290,width:"100%",textAlign:"center",boxShadow:"0 0 40px #9b59b655"}}><div style={{fontSize:36,marginBottom:6}}>🎯</div><div style={{color:"#9b59b6",fontWeight:900,fontSize:18,marginBottom:6}}>Mode Focus</div><div style={{color:"rgba(255,255,255,.55)",fontSize:12,marginBottom:16,lineHeight:1.5}}>Mots en dessous du seuil uniquement.</div><div style={{marginBottom:16}}><div style={{color:"rgba(255,255,255,.8)",fontSize:12,marginBottom:8}}>Seuil : <span style={{color:"#9b59b6",fontWeight:800,fontSize:17}}>{thresh}.0</span>/10</div><input type="range" min={1} max={9} step={1} value={thresh} onChange={e=>setThresh(+e.target.value)} style={{width:"100%",accentColor:"#9b59b6",cursor:"pointer"}}/><div style={{marginTop:10,padding:"6px 12px",borderRadius:8,background:"rgba(155,89,182,0.1)",border:"1px solid rgba(155,89,182,0.25)"}}><span style={{color:"#9b59b6",fontWeight:700}}>{elig.length}</span><span style={{color:"rgba(255,255,255,.4)",fontSize:11}}> mot{elig.length!==1?"s":""} à travailler</span></div></div><div style={{display:"flex",gap:10,justifyContent:"center"}}><button onClick={onClose} style={{background:"rgba(255,255,255,.07)",color:"rgba(255,255,255,.5)",border:"1px solid rgba(255,255,255,.1)",borderRadius:11,padding:"9px 16px",cursor:"pointer",fontSize:12}}>← Retour</button>{elig.length>0&&<button onClick={()=>onStart(thresh)} style={{background:"linear-gradient(135deg,#9b59b6,#6c3483)",color:"#fff",border:"none",borderRadius:11,padding:"9px 16px",cursor:"pointer",fontWeight:700,fontSize:12}}>Commencer 🎯</button>}</div></div></div>);}
 function FocusCompletePopup({thresh,onOk}){return(<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,padding:20}}><div style={{background:"linear-gradient(135deg,#0a0010,#1a0020)",border:"2px solid #27ae60",borderRadius:22,padding:"28px 20px",maxWidth:270,width:"100%",textAlign:"center",boxShadow:"0 0 40px #27ae6055"}}><div style={{fontSize:44,marginBottom:8}}>✨</div><div style={{color:"#27ae60",fontWeight:900,fontSize:17,marginBottom:8}}>Objectif atteint !</div><div style={{color:"rgba(255,255,255,.6)",fontSize:13,lineHeight:1.6,marginBottom:20}}>Il n'y a plus de mot en dessous de <span style={{color:"#27ae60",fontWeight:700}}>{thresh}.0/10</span> !</div><button onClick={onOk} style={{background:"linear-gradient(135deg,#27ae60,#1e8449)",color:"#fff",border:"none",borderRadius:11,padding:"11px 28px",cursor:"pointer",fontWeight:700,fontSize:13}}>OK ✓</button></div></div>);}
 
@@ -353,7 +492,7 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
   const [streak,setStreak]=useState(0);const [sessionCards,setSessionCards]=useState(0);const [curWord,setCurWord]=useState(null);const [rev,setRev]=useState(false);
   const [flipped,setFlipped]=useState(false);const [locked,setLocked]=useState(false);
   const [showPerfect,setShowPerfect]=useState(false);const [showPlat,setShowPlat]=useState(false);
-  const [milestone,setMilestone]=useState(null);const [rankUp,setRankUp]=useState(null);
+  const [milestone,setMilestone]=useState(null);const [rankUp,setRankUp]=useState<{rank:any,coins:number}|null>(null);
   const [xpAnim,setXpAnim]=useState(null);const [coinAnim,setCoinAnim]=useState(null);
   const touchX=useRef(null);const latRs=useRef(rs);useEffect(()=>{latRs.current=rs;},[rs]);
   const prevActive=useRef(isActive);
@@ -385,7 +524,7 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
     const oldLi=getRankInfo(latXp.current).levelIdx;
     latXp.current=newXp;
     const newRankInfo=getRankInfo(newXp);
-    if(newRankInfo.levelIdx>oldLi)setRankUp(newRankInfo.rank);
+    if(newRankInfo.levelIdx>oldLi){let rc=0;for(let li=oldLi+1;li<=newRankInfo.levelIdx;li++){const rr=RANK_REWARDS[li as keyof typeof RANK_REWARDS];if(rr)rc+=rr.coins;}setRankUp({rank:newRankInfo.rank,coins:rc});}
     // Badges: streak
     onScore(curWord[0],correct,earned,nc,ns,jp);
     onQP({cardFlipped:1,streak:ns,xpEarned:earned,mastered:jm?1:0});
@@ -406,14 +545,14 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
     {milestone&&<MilestonePopup count={milestone} onClose={()=>setMilestone(null)}/>}
     {showPerfect&&<div style={{position:"absolute",top:"30%",left:"50%",transform:"translate(-50%,-50%)",zIndex:120,pointerEvents:"none",animation:"milAnim 1.3s ease forwards"}}><div style={{background:"linear-gradient(135deg,#0d2818,#071510)",border:"2px solid #27ae60",borderRadius:16,padding:"10px 20px",textAlign:"center",boxShadow:"0 0 28px #27ae6088"}}><div style={{fontSize:24}}>⭐</div><div style={{color:"#27ae60",fontWeight:800,fontSize:13}}>Mot maîtrisé !</div></div></div>}
     {showPlat&&<PlatinumPopup lang={langKey} onContinue={()=>{setShowPlat(false);pick(curWord[0]);}} onMenu={onMenu}/>}
-    {rankUp&&<RankUpPopup rank={rankUp} onClose={()=>setRankUp(null)}/>}
+    {rankUp&&<RankUpPopup rank={rankUp.rank} coinsAwarded={rankUp.coins} onClose={()=>setRankUp(null)}/>}
     <div style={{flex:1,display:"flex",flexDirection:"column",padding:"8px 12px",gap:8,position:"relative",zIndex:1}}>
       {/* Top bar */}
       <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
         {fm?<button onClick={exitFocus} style={{background:"rgba(155,89,182,.2)",color:"#9b59b6",border:"1px solid #9b59b6",borderRadius:16,padding:"4px 10px",fontSize:11,cursor:"pointer",fontWeight:700}}>✕ Focus</button>:(()=>{const disc=words.filter(([w])=>rs[w]!=null).length;const canFocus=disc>=50;return(<button onClick={()=>{if(canFocus)setShowFE(true);}} title={canFocus?"":"Découvre 50 mots pour débloquer le mode Focus"} style={{background:canFocus?"linear-gradient(135deg,rgba(155,89,182,.2),rgba(100,0,80,.2))":"rgba(255,255,255,.04)",color:canFocus?"#9b59b6":"rgba(255,255,255,.2)",border:`1px solid ${canFocus?"rgba(155,89,182,.4)":"rgba(255,255,255,.1)"}`,borderRadius:16,padding:"4px 10px",fontSize:11,cursor:canFocus?"pointer":"default",fontWeight:700}}>{canFocus?"🎯 Focus":`🔒 Focus (${disc}/50)`}</button>);})()}
         {fm&&ft&&<span style={{background:"rgba(155,89,182,.12)",border:"1px solid rgba(155,89,182,.25)",borderRadius:8,padding:"2px 7px",color:"#9b59b6",fontSize:10,fontWeight:600}}>{"<"}{ft}.0</span>}
         <div style={{marginLeft:"auto",position:"relative",display:"flex",alignItems:"center"}}>
-          {xpAnim&&<div style={{position:"absolute",right:"100%",top:0,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:1,pointerEvents:"none",marginRight:6}}><span style={{color:"#4ecdc4",fontSize:11,fontWeight:800,animation:"floatUp .8s ease forwards"}}>+{xpAnim.base} XP</span>{xpAnim.bonus>0&&<span style={{color:"#ff9800",fontSize:11,fontWeight:800,animation:"floatUp .8s ease .1s forwards"}}>+{xpAnim.bonus} XP 🔥</span>}</div>}
+          {xpAnim&&<div style={{position:"fixed",top:"14%",left:"50%",transform:"translateX(-50%)",display:"flex",flexDirection:"column",alignItems:"center",gap:3,pointerEvents:"none",zIndex:50}}><span style={{color:"#4ecdc4",fontSize:18,fontWeight:900,animation:"floatUp 1s ease forwards",textShadow:"0 0 12px #4ecdc4",letterSpacing:-.5}}>+{xpAnim.base} XP</span>{xpAnim.bonus>0&&<span style={{color:"#ff9800",fontSize:16,fontWeight:900,animation:"floatUp 1s ease .12s forwards",textShadow:"0 0 10px #ff9800"}}>+{xpAnim.bonus} XP 🔥</span>}</div>}
           <Flame streak={streak}/>
         </div>
       </div>
@@ -435,6 +574,7 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
             </div>
             {/* Back — same skin as front */}
             <div style={{position:"absolute",inset:0,backfaceVisibility:"hidden",WebkitBackfaceVisibility:"hidden",transform:"rotateY(180deg)",borderRadius:18,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,boxShadow:"0 8px 28px rgba(0,0,0,.6)",border:`1.5px solid ${sk.brd}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:20,isolation:"isolate"}}>
+              {Ovl&&<div style={{position:"absolute",inset:0,borderRadius:18,overflow:"hidden",pointerEvents:"none"}}><Ovl/></div>}
               <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:8}}><span style={{fontSize:28}}>{aFlag}</span><span style={{color:sk.tc,fontSize:22,fontWeight:700,textAlign:"center",lineHeight:1.2,textShadow:sk.tc==="#3d2b0e"||sk.tc==="#3a2a1a"?"none":"0 1px 4px rgba(0,0,0,0.5)"}}>{answer}</span></div>
             </div>
           </div>
@@ -447,7 +587,7 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
       {/* Session counter */}
       <div style={{flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",gap:10,paddingBottom:2,position:"relative"}}>
         <span style={{color:T.acc,fontSize:22,fontWeight:900,letterSpacing:-1}}>{sessionCards}</span><span style={{color:T.sub,fontSize:13}}> carte{sessionCards>1?"s":""}</span>
-        {coinAnim&&<div style={{display:"flex",alignItems:"center",gap:3,animation:"floatUp .7s ease forwards",position:"absolute",right:"calc(50% - 66px)"}}><CoinIcon size={14}/><span style={{color:"#ffd700",fontSize:13,fontWeight:800}}>{coinAnim}</span></div>}
+        {coinAnim&&<div style={{display:"flex",alignItems:"center",gap:5,animation:"floatUp .85s ease forwards",position:"absolute",right:12,background:"rgba(0,0,0,0.55)",borderRadius:10,padding:"4px 10px",border:"1px solid rgba(255,215,0,0.3)"}}><CoinIcon size={18}/><span style={{color:"#ffd700",fontSize:16,fontWeight:900,letterSpacing:-.3}}>{coinAnim}</span></div>}
       </div>
     </div>
   </div>);}
@@ -471,30 +611,48 @@ function QuestsTab({quests,questDef,weeklyQuests,weeklyQuestDef,T}){
 function ShopTab({langState,T,onEquip,onOpenBox}){
   const {coins,inventory,equipped}=langState;
   const [lootState,setLootState]=useState(null);
+  const [shopTab,setShopTab]=useState<"skins"|"themes">("skins");
   const rord=["commun","rare","super_rare","epique","legendaire","secret"];
   function handleBox(box){if(coins<box.cost)return;const item=rollLoot(box);const alreadyOwned=inventory.includes(item.id);onOpenBox(box.cost,item.id);setLootState({box,item,alreadyOwned});}
   const skBoxes=LOOT_BOXES.filter(b=>b.type==="skin");const thBoxes=LOOT_BOXES.filter(b=>b.type==="theme");
+  const boxes=shopTab==="skins"?skBoxes:thBoxes;
+  const boxType=shopTab==="skins"?"skin":"theme";
+
+  const renderBox=(box)=>{const canBuy=coins>=box.cost;return(<div key={box.id} style={{background:`${box.col}0d`,border:`1px solid ${box.col}44`,borderRadius:14,padding:"12px",marginBottom:8}}>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+      <ChestSVG level={box.level} type={boxType} size={52}/>
+      <div style={{flex:1}}><div style={{color:T.txt,fontWeight:800,fontSize:14}}>{box.label}</div><div style={{display:"flex",alignItems:"center",gap:3,marginTop:2}}><CoinIcon size={12}/><span style={{color:"#ffd700",fontSize:12,fontWeight:700}}>{box.cost}</span></div></div>
+      <button onClick={()=>handleBox(box)} disabled={!canBuy} style={{background:canBuy?`linear-gradient(135deg,${box.col},${box.col}aa)`:"rgba(255,255,255,0.05)",color:canBuy?"#fff":T.sub,border:"none",borderRadius:10,padding:"10px 14px",cursor:canBuy?"pointer":"default",fontWeight:700,fontSize:13,flexShrink:0}}>{canBuy?"Ouvrir":"🔒"}</button>
+    </div>
+    <div style={{borderTop:`1px solid rgba(255,255,255,.06)`,paddingTop:7}}>
+      {box.pool.map(it=>{const rar=RARITY[it.rar]||RARITY.commun;return(<div key={it.id} style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>{it.secret?"???":it.name}</span><div style={{display:"flex",gap:5}}><span style={{fontSize:10,color:rar.col,fontWeight:600}}>{rar.l}</span><span style={{fontSize:10,color:"rgba(255,255,255,.3)"}}>{(it.p*100).toFixed(1)}%</span></div></div>);})}
+    </div>
+  </div>);};
+
   return(<div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
     {lootState&&<RouletteOpening box={lootState.box} wonItem={lootState.item} alreadyOwned={lootState.alreadyOwned} onClose={()=>setLootState(null)}/>}
-    <div style={{padding:"7px 10px",display:"flex",alignItems:"center",gap:4,flexShrink:0,borderBottom:`1px solid ${T.brd}`}}><CoinIcon size={16}/><span style={{color:"#ffd700",fontSize:13,fontWeight:700,marginLeft:2}}>{coins}</span><span style={{color:T.sub,fontSize:11}}> pièces</span></div>
+    {/* Balance */}
+    <div style={{padding:"7px 10px",display:"flex",alignItems:"center",gap:4,flexShrink:0,borderBottom:`1px solid ${T.brd}`}}><CoinIcon size={16}/><span style={{color:"#ffd700",fontSize:13,fontWeight:700,marginLeft:2}}>{fmtCoins(coins)}</span><span style={{color:T.sub,fontSize:11}}> pièces</span></div>
+    {/* Tab selector */}
+    <div style={{display:"flex",borderBottom:`1px solid ${T.brd}`,flexShrink:0}}>
+      {([["skins","🃏 Skins"],["themes","🎨 Thèmes"]] as const).map(([k,l])=>(
+        <button key={k} onClick={()=>setShopTab(k)} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:shopTab===k?T.acc:T.sub,fontWeight:shopTab===k?700:400,fontSize:13,padding:"9px 0",borderBottom:`2px solid ${shopTab===k?T.acc:"transparent"}`,transition:"all .15s"}}>{l}</button>
+      ))}
+    </div>
     <div style={{flex:1,overflowY:"auto",padding:"10px 12px"}}>
-      {/* COFFRES SKINS */}
-      <div style={{marginBottom:6}}><div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🃏 Coffres Skins</div>
-        {skBoxes.map(box=>{const canBuy=coins>=box.cost;return(<div key={box.id} style={{background:`${box.col}0d`,border:`1px solid ${box.col}44`,borderRadius:14,padding:"12px",marginBottom:8}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><ChestSVG level={box.level} type="skin" size={52}/><div style={{flex:1}}><div style={{color:T.txt,fontWeight:800,fontSize:14}}>{box.label}</div><div style={{display:"flex",alignItems:"center",gap:3,marginTop:2}}><CoinIcon size={12}/><span style={{color:"#ffd700",fontSize:12,fontWeight:700}}>{box.cost}</span></div></div><button onClick={()=>handleBox(box)} disabled={!canBuy} style={{background:canBuy?`linear-gradient(135deg,${box.col},${box.col}aa)`:"rgba(255,255,255,0.05)",color:canBuy?"#fff":T.sub,border:"none",borderRadius:10,padding:"10px 14px",cursor:canBuy?"pointer":"default",fontWeight:700,fontSize:13,flexShrink:0}}>{canBuy?"Ouvrir":"🔒"}</button></div><div style={{borderTop:`1px solid rgba(255,255,255,.06)`,paddingTop:7}}>{box.pool.map(it=>{const rar=RARITY[it.rar]||RARITY.commun;return(<div key={it.id} style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>{it.secret?"???":it.name}</span><div style={{display:"flex",gap:5}}><span style={{fontSize:10,color:rar.col,fontWeight:600}}>{rar.l}</span><span style={{fontSize:10,color:"rgba(255,255,255,.3)"}}>{Math.round(it.p*100)}%</span></div></div>);})}</div></div>);})}
-      </div>
-      <div style={{height:1,background:`${T.brd}`,margin:"4px 0 12px"}}/>
-      {/* COFFRES THEMES */}
-      <div style={{marginBottom:6}}><div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🎨 Coffres Thèmes</div>
-        {thBoxes.map(box=>{const canBuy=coins>=box.cost;return(<div key={box.id} style={{background:`${box.col}0d`,border:`1px solid ${box.col}44`,borderRadius:14,padding:"12px",marginBottom:8}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><ChestSVG level={box.level} type="theme" size={52}/><div style={{flex:1}}><div style={{color:T.txt,fontWeight:800,fontSize:14}}>{box.label}</div><div style={{display:"flex",alignItems:"center",gap:3,marginTop:2}}><CoinIcon size={12}/><span style={{color:"#ffd700",fontSize:12,fontWeight:700}}>{box.cost}</span></div></div><button onClick={()=>handleBox(box)} disabled={!canBuy} style={{background:canBuy?`linear-gradient(135deg,${box.col},${box.col}aa)`:"rgba(255,255,255,0.05)",color:canBuy?"#fff":T.sub,border:"none",borderRadius:10,padding:"10px 14px",cursor:canBuy?"pointer":"default",fontWeight:700,fontSize:13,flexShrink:0}}>{canBuy?"Ouvrir":"🔒"}</button></div><div style={{borderTop:`1px solid rgba(255,255,255,.06)`,paddingTop:7}}>{box.pool.map(it=>{const rar=RARITY[it.rar]||RARITY.commun;return(<div key={it.id} style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>{it.secret?"???":it.name}</span><div style={{display:"flex",gap:5}}><span style={{fontSize:10,color:rar.col,fontWeight:600}}>{rar.l}</span><span style={{fontSize:10,color:"rgba(255,255,255,.3)"}}>{Math.round(it.p*100)}%</span></div></div>);})}</div></div>);})}
-      </div>
-      <div style={{height:1,background:T.brd,margin:"4px 0 12px"}}/>
-      {/* EQUIPER THEMES */}
-      <div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🎨 Thèmes</div>
-      {Object.entries(THEMES).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,th])=>{const id="theme_"+k,owned=th.free||inventory.includes(id),isEq=equipped.theme===k;const rar=RARITY[th.rarity]||RARITY.commun;return(<div key={k} style={{background:`${th.acc}0a`,border:`1px solid ${isEq?th.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><ThemeIcon k={k} th={th} size={36}/><div style={{flex:1,minWidth:0}}><div style={{color:T.txt,fontWeight:700,fontSize:12}}>{th.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{th.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓</span>:owned?<button onClick={()=>{SFX.nav();onEquip("theme",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
-      <div style={{height:1,background:T.brd,margin:"8px 0 12px"}}/>
-      {/* EQUIPER SKINS */}
-      <div style={{color:T.sub,fontSize:11,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🃏 Skins de carte</div>
-      {Object.entries(SKINS).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,sk])=>{const id="skin_"+k,owned=sk.free||inventory.includes(id),isEq=equipped.skin===k;const rar=RARITY[sk.rarity]||RARITY.commun;return(<div key={k} style={{background:"rgba(255,255,255,.04)",border:`1px solid ${isEq?T.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,border:`1.5px solid ${sk.brd}`,flexShrink:0,overflow:"hidden",position:"relative"}}>{(()=>{const O=sk.ovl?SK_OVLS[sk.ovl]:null;return O?<O/>:null;})()}</div><div style={{flex:1,minWidth:0}}><div style={{color:sk.tc&&sk.tc!=="undefined"?T.txt:T.txt,fontWeight:700,fontSize:12}}>{sk.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{sk.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓</span>:owned?<button onClick={()=>{SFX.nav();onEquip("skin",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
+      {/* COFFRES */}
+      <div style={{color:T.sub,fontSize:10,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>📦 Coffres</div>
+      {boxes.map(renderBox)}
+      <div style={{height:1,background:T.brd,margin:"8px 0 14px"}}/>
+      {/* INVENTAIRE */}
+      {shopTab==="skins"&&<>
+        <div style={{color:T.sub,fontSize:10,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🃏 Skins de carte</div>
+        {Object.entries(SKINS).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,sk])=>{const id="skin_"+k,owned=sk.free||inventory.includes(id),isEq=equipped.skin===k;const rar=RARITY[sk.rarity]||RARITY.commun;return(<div key={k} style={{background:"rgba(255,255,255,.04)",border:`1px solid ${isEq?T.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><div style={{width:32,height:32,borderRadius:7,background:`linear-gradient(135deg,${sk.bg1},${sk.bg2})`,border:`1.5px solid ${sk.brd}`,flexShrink:0,overflow:"hidden",position:"relative"}}>{(()=>{const O=sk.ovl?SK_OVLS[sk.ovl]:null;return O?<O/>:null;})()}</div><div style={{flex:1,minWidth:0}}><div style={{color:T.txt,fontWeight:700,fontSize:12}}>{sk.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{sk.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓ Équipé</span>:owned?<button onClick={()=>{SFX.nav();onEquip("skin",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
+      </>}
+      {shopTab==="themes"&&<>
+        <div style={{color:T.sub,fontSize:10,fontWeight:700,marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>🎨 Thèmes</div>
+        {Object.entries(THEMES).sort((a,b)=>rord.indexOf(a[1].rarity)-rord.indexOf(b[1].rarity)).map(([k,th])=>{const id="theme_"+k,owned=th.free||inventory.includes(id),isEq=equipped.theme===k;const rar=RARITY[th.rarity]||RARITY.commun;return(<div key={k} style={{background:`${th.acc}0a`,border:`1px solid ${isEq?th.acc:T.brd}`,borderRadius:11,padding:"9px 12px",marginBottom:6,display:"flex",alignItems:"center",gap:10}}><ThemeIcon k={k} th={th} size={36}/><div style={{flex:1,minWidth:0}}><div style={{color:T.txt,fontWeight:700,fontSize:12}}>{th.label}</div><div style={{color:rar.col,fontSize:10,fontWeight:600}}>{th.free?"Gratuit":rar.l}</div></div>{isEq?<span style={{color:T.acc,fontSize:11,fontWeight:700,flexShrink:0}}>✓ Équipé</span>:owned?<button onClick={()=>{SFX.nav();onEquip("theme",k);}} style={{background:T.acc,color:"#000",border:"none",borderRadius:7,padding:"4px 9px",cursor:"pointer",fontSize:11,fontWeight:700,flexShrink:0}}>Équiper</button>:<span style={{color:T.sub,fontSize:10,flexShrink:0}}>🔒</span>}</div>);})}
+      </>}
     </div>
   </div>);}
 
@@ -509,7 +667,7 @@ function ProfileScreen({state,T,onBack,onChangePseudo,debugCoins,onUnlockAll,onR
         :<div style={{display:"flex",alignItems:"center",gap:10}}><div style={{fontSize:30,color:T.acc}}>👤</div><div style={{flex:1}}><div style={{color:T.txt,fontWeight:800,fontSize:17}}>{state.pseudo}</div><div style={{color:T.sub,fontSize:11}}>Joueur</div></div><button onClick={()=>{setNp(state.pseudo||"");setEditing(true);}} style={{background:"rgba(255,255,255,.07)",color:T.sub,border:`1px solid ${T.brd}`,borderRadius:8,padding:"5px 9px",cursor:"pointer",fontSize:11}}>✏️</button></div>}
       </div>
       <div style={{color:T.txt,fontWeight:800,fontSize:14,marginBottom:8}}>📊 Progression</div>
-      {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank}=getRankInfo(ls.xp||0);return(<div key={lk} style={{background:"rgba(255,255,255,.04)",border:`1px solid ${T.brd}`,borderRadius:12,padding:"9px 12px",marginBottom:7,display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:20}}>{li.flag}</span><div style={{flex:1}}><div style={{color:T.txt,fontWeight:700,fontSize:13}}>{li.label}</div><div style={{color:T.sub,fontSize:11}}>{m}/{tot} · <CoinIcon size={10}/> {ls.coins}</div></div><RankBadge rank={rank} size={32}/></div>);})}
+      {Object.entries(LANG_INFO).map(([lk,li])=>{const ls=state.langs[lk];const ws=WORDS[lk],tot=ws.length;const m=ws.filter(([w])=>(ls.rawScores[w]??-1)>=70).length;const{rank}=getRankInfo(ls.xp||0);return(<div key={lk} style={{background:"rgba(255,255,255,.04)",border:`1px solid ${T.brd}`,borderRadius:12,padding:"9px 12px",marginBottom:7,display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:20}}>{li.flag}</span><div style={{flex:1}}><div style={{color:T.txt,fontWeight:700,fontSize:13}}>{li.label}</div><div style={{color:T.sub,fontSize:11}}>{m}/{tot} · <CoinIcon size={10}/> {fmtCoins(ls.coins||0)}</div></div><RankBadge rank={rank} size={32}/></div>);})}
       <div style={{color:T.txt,fontWeight:800,fontSize:14,margin:"12px 0 8px"}}>🏅 Badges</div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{BADGES.map(b=>{const has=state.badges.includes(b.id);return(<div key={b.id} title={b.l} style={{background:has?"rgba(255,255,255,.08)":"rgba(255,255,255,.03)",border:`1px solid ${has?T.acc:T.brd}`,borderRadius:9,padding:"4px 7px",display:"flex",alignItems:"center",gap:4,opacity:has?1:.3}}><span style={{fontSize:14}}>{b.ic}</span><span style={{color:has?T.txt:T.sub,fontSize:10,fontWeight:has?700:400,maxWidth:60,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{b.l}</span></div>);})}</div>
       <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:8}}>
@@ -549,7 +707,7 @@ function LeaderboardScreen({T,onBack,myUUID}){
     <div style={{padding:"10px 12px",background:"rgba(0,0,0,0.4)",borderBottom:`1px solid ${T.brd}`,display:"flex",alignItems:"center",gap:10,flexShrink:0}}><button onClick={onBack} style={{background:"rgba(255,255,255,.07)",border:"none",color:T.txt,borderRadius:8,padding:"4px 9px",cursor:"pointer",fontSize:12}}>← Retour</button><span style={{color:T.txt,fontWeight:800,fontSize:15,flex:1}}>🏆 Classement</span></div>
     <div style={{display:"flex",borderBottom:`1px solid ${T.brd}`,flexShrink:0}}>{[{k:"total",l:"Total"},{k:"en",l:"🇬🇧"},{k:"de",l:"🇩🇪"},{k:"es",l:"🇪🇸"},{k:"it",l:"🇮🇹"}].map(({k,l})=>(<button key={k} onClick={()=>setFilter(k)} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:filter===k?T.acc:T.sub,fontWeight:filter===k?700:400,fontSize:12,padding:"9px 0",borderBottom:`2px solid ${filter===k?T.acc:"transparent"}`}}>{l}</button>))}</div>
     <div style={{flex:1,overflowY:"auto",padding:"12px"}}>
-      {loading?<div style={{color:T.sub,textAlign:"center",marginTop:40,fontSize:13}}>Chargement...</div>:sorted.length===0?<div style={{color:T.sub,textAlign:"center",marginTop:40,fontSize:13}}>Aucun joueur. Soyez le premier !</div>:sorted.map((e,i)=>{const xp=filter==="total"?(e.xp_en||0)+(e.xp_de||0)+(e.xp_es||0)+(e.xp_it||0):(e["xp_"+filter]||0);const isMe=e.uuid===myUUID;return(<div key={e.uuid||i} style={{background:isMe?"rgba(78,205,196,0.09)":"rgba(255,255,255,.04)",border:`1px solid ${isMe?T.acc:T.brd}`,borderRadius:12,padding:"10px 14px",marginBottom:7,display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:i<3?20:13,minWidth:28,flexShrink:0,color:i<3?"inherit":"#aaa"}}>{medals[i]||("#"+(i+1))}</span><div style={{flex:1}}><span style={{color:isMe?T.acc:T.txt,fontWeight:isMe?800:700,fontSize:14}}>{e.pseudo||"?"}</span>{isMe&&<span style={{color:T.sub,fontSize:11}}> (moi)</span>}</div><span style={{color:T.acc,fontSize:12,fontWeight:700}}>{xp} XP</span></div>);})}
+      {loading?<div style={{color:T.sub,textAlign:"center",marginTop:40,fontSize:13}}>Chargement...</div>:sorted.length===0?<div style={{color:T.sub,textAlign:"center",marginTop:40,fontSize:13}}>Aucun joueur. Soyez le premier !</div>:sorted.map((e,i)=>{const xp=filter==="total"?(e.xp_en||0)+(e.xp_de||0)+(e.xp_es||0)+(e.xp_it||0):(e["xp_"+filter]||0);const isMe=e.uuid===myUUID;const{rank}=getRankInfo(xp);return(<div key={e.uuid||i} style={{background:isMe?"rgba(78,205,196,0.09)":"rgba(255,255,255,.04)",border:`1px solid ${isMe?T.acc:T.brd}`,borderRadius:12,padding:"10px 12px",marginBottom:7,display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:i<3?20:13,minWidth:24,flexShrink:0,textAlign:"center",color:i<3?"inherit":"#aaa"}}>{medals[i]||("#"+(i+1))}</span><RankBadge rank={rank} size={32}/><div style={{flex:1,minWidth:0}}><span style={{color:isMe?T.acc:T.txt,fontWeight:isMe?800:700,fontSize:13}}>{e.pseudo||"?"}</span>{isMe&&<span style={{color:T.sub,fontSize:10}}> (moi)</span>}<div style={{color:rank.col,fontSize:9,fontWeight:600,marginTop:1}}>{rank.l}</div></div><span style={{color:T.acc,fontSize:12,fontWeight:700,flexShrink:0}}>{xp} XP</span></div>);})}
     </div>
   </div>);}
 
@@ -570,7 +728,7 @@ function HomeScreen({state,T,onSelect,onProfile,onLeaderboard}){
           <span style={{color:rank.col,fontSize:9,fontWeight:700,letterSpacing:.5}}>{rank.l}</span>
         </div>
         <div style={{width:"78%"}}><div style={{display:"flex",gap:1.5,marginBottom:3}}>{Array.from({length:12}).map((_,i)=>{const f=i<Math.round(rPct/100*12);return(<div key={i} style={{flex:1,height:5,borderRadius:1,background:f?rank.col:"rgba(255,255,255,.07)",boxShadow:f?`0 0 3px ${rank.glow}`:"none"}}/>);})}</div><div style={{color:T.sub,fontSize:9,textAlign:"center"}}>{m}/{tot} · {Math.round(m/tot*100)}%</div></div>
-        <div style={{position:"absolute",top:7,right:9,display:"flex",alignItems:"center",gap:2}}><CoinIcon size={11}/><span style={{color:"#ffd700",fontSize:9,fontWeight:700}}>{ls.coins||0}</span></div>
+        <div style={{position:"absolute",top:7,right:9,display:"flex",alignItems:"center",gap:2}}><CoinIcon size={11}/><span style={{color:"#ffd700",fontSize:9,fontWeight:700}}>{fmtCoins(ls.coins||0)}</span></div>
       </button>);})}
     </div>
   </div>);}

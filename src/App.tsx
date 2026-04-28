@@ -147,74 +147,93 @@ const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},bad
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
 function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><linearGradient id="lpCoin" x1="15%" y1="0%" x2="85%" y2="100%"><stop offset="0%" stopColor="#fff176"/><stop offset="40%" stopColor="#ffd700"/><stop offset="100%" stopColor="#b8860b"/></linearGradient></defs><polygon points="12,1 19.5,4.5 23,12 19.5,19.5 12,23 4.5,19.5 1,12 4.5,4.5" fill="url(#lpCoin)" stroke="#c9940a" strokeWidth="0.7"/><polygon points="12,3.5 17.5,6.2 20,12 17.5,17.8 12,20.5 6.5,17.8 4,12 6.5,6.2" fill="rgba(255,248,120,0.2)"/><polygon points="9,8 15,8 17,12 15,16 9,16 7,12" fill="none" stroke="rgba(255,255,180,0.35)" strokeWidth="0.6"/><text x="12" y="15.8" textAnchor="middle" fontSize="7" fontWeight="900" fill="rgba(100,55,0,0.8)" fontFamily="Arial">$</text></svg>);}
 
-function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;const sid="rs"+r.id+size;const cid="rc"+r.id+size;const lid="rl"+r.id+size;
-  // Aura intensity per base rank
-  const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:3,alpha:.2},bronze:{blur:5,alpha:.35},silver:{blur:6,alpha:.4},gold:{blur:9,alpha:.55},diamond:{blur:12,alpha:.65},plat:{blur:14,alpha:.75},solar:{blur:18,alpha:.9}};
-  const aura=auraMap[r.baseId]||{blur:3,alpha:.2};
+function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;const sid="rs"+r.id+size;
+  const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:4,alpha:.22},bronze:{blur:6,alpha:.32},silver:{blur:8,alpha:.38},gold:{blur:10,alpha:.55},diamond:{blur:12,alpha:.6},plat:{blur:14,alpha:.72},solar:{blur:18,alpha:.92}};
+  const aura=auraMap[r.baseId]||{blur:4,alpha:.2};
   const rankTier=r.sub||1,isTier2=rankTier>=2,isTier3=rankTier>=3,isSolar=r.id==="solar";
+  const dotXs=r.nStars===1?[30]:r.nStars===2?[22,38]:r.nStars===3?[16,30,44]:[];
   return(
   <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0,overflow:"visible"}}>
     <defs>
       <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient>
-      <radialGradient id={sid} cx="50%" cy="40%" r="65%"><stop offset="0%" stopColor="#fff6c2"/><stop offset="45%" stopColor={r.ss}/><stop offset="100%" stopColor={r.col}/></radialGradient>
-      <linearGradient id={cid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fffbd4"/><stop offset="35%" stopColor="#ffe47a"/><stop offset="70%" stopColor="#ffca28"/><stop offset="100%" stopColor="#b86a00"/></linearGradient>
-      <linearGradient id={lid} x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stopColor="#fffef6"/><stop offset="100%" stopColor="rgba(255,255,255,0)"/></linearGradient>
-      <filter id={fid} x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation={aura.blur} result="blur"/>
-        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-      </filter>
+      <radialGradient id={sid} cx="50%" cy="35%" r="70%"><stop offset="0%" stopColor="#ffffff"/><stop offset="28%" stopColor={r.ss}/><stop offset="100%" stopColor={r.col}/></radialGradient>
+      <filter id={fid} x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation={aura.blur} result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
     </defs>
-    {/* Aura glow */}
-    <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+
+    <ellipse cx="30" cy="28" rx={r.baseId==="solar"?22:18} ry={r.baseId==="solar"?22:18} fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+
+    {r.baseId==="wood"&&<>
+      <path d="M14 10 L46 10 L50 19 L48 38 L30 55 L12 38 L10 19 Z" fill={`url(#${gid})`} stroke="#9a5b1f" strokeWidth="1.6"/>
+      <path d="M18 14 L42 14 L45 20 L43 35 L30 48 L17 35 L15 20 Z" fill="none" stroke="#d8a25d" strokeWidth="1.1" opacity=".75"/>
+      <path d="M20 21 L40 21" stroke="rgba(255,220,170,.35)" strokeWidth=".9"/>
+      <path d="M18 27 L42 27" stroke="rgba(255,220,170,.18)" strokeWidth=".8"/>
+      <path d="M22 15 L33 15 L26 32 L18 32 Z" fill="rgba(255,255,255,.12)"/>
+      {isTier2&&<path d="M16 18 Q30 13 44 18" fill="none" stroke="#e8c27d" strokeWidth="1" opacity=".75"/>}
+      {isTier3&&<><path d="M20 41 L30 49 L40 41" fill="none" stroke="#f3d39b" strokeWidth="1.1" opacity=".75"/><path d="M30 16 L30 48" stroke="rgba(255,255,255,.18)" strokeWidth=".8"/></>}
+    </>}
+
+    {r.baseId==="bronze"&&<>
+      <circle cx="30" cy="28" r="16.5" fill={`url(#${gid})`} stroke="#f0b15a" strokeWidth="1.6"/>
+      <circle cx="30" cy="28" r="12.5" fill="none" stroke="rgba(255,220,150,.55)" strokeWidth="1"/>
+      <circle cx="30" cy="28" r="7.5" fill="none" stroke="rgba(255,220,150,.38)" strokeWidth=".9"/>
+      <circle cx="30" cy="28" r="2.8" fill="#ffe0a0" opacity=".8"/>
+      {Array.from({length:12}).map((_,i)=>{const a=i*30*Math.PI/180;return <line key={i} x1={30+13.8*Math.cos(a)} y1={28+13.8*Math.sin(a)} x2={30+16.3*Math.cos(a)} y2={28+16.3*Math.sin(a)} stroke="rgba(255,230,180,.55)" strokeWidth=".75" strokeLinecap="round"/>;})}
+      {isTier2&&<circle cx="30" cy="28" r="10" fill="none" stroke="rgba(255,235,190,.45)" strokeWidth=".8" strokeDasharray="2.2 2.2"/>}
+      {isTier3&&Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <circle key={i} cx={30+9.6*Math.cos(a)} cy={28+9.6*Math.sin(a)} r="1" fill="#ffe6ae" opacity=".8"/>;})}
+    </>}
+
+    {r.baseId==="silver"&&<>
+      <path d="M16 13 L30 7 L44 13 L44 35 L30 50 L16 35 Z" fill={`url(#${gid})`} stroke="#d9e8f6" strokeWidth="1.6"/>
+      <path d="M20 16 L30 12 L40 16 L40 33 L30 44 L20 33 Z" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="1"/>
+      <path d="M30 8.5 L30 49" stroke="rgba(255,255,255,.25)" strokeWidth=".8"/>
+      <path d="M16.8 13.8 L30 28 L43.2 13.8" stroke="rgba(255,255,255,.18)" strokeWidth=".8" fill="none"/>
+      <path d="M18 14 L26 14 L21 25 L15 25 Z" fill="rgba(255,255,255,.18)"/>
+      {isTier2&&<path d="M20 34 L30 40 L40 34" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth=".9"/>}
+      {isTier3&&<><path d="M20 22 L30 18 L40 22" fill="none" stroke="rgba(255,255,255,.48)" strokeWidth=".9"/><path d="M20 17 L40 17" stroke="rgba(255,255,255,.3)" strokeWidth=".7"/></>}
+    </>}
+
+    {r.baseId==="gold"&&<>
+      <path d="M12 38 L12 47 L48 47 L48 38" fill={`url(#${gid})`} stroke="#ffdd66" strokeWidth="1.6"/>
+      <path d="M12 38 L18 25 L24 31 L30 17 L36 30 L42 23 L48 38 Z" fill={`url(#${gid})`} stroke="#ffdd66" strokeWidth="1.8" strokeLinejoin="round"/>
+      <path d="M15 38 L21 28.5 L25.5 33.2 L30 21.5 L34.5 32.8 L39 27.2 L45 38" fill="none" stroke="#fff3a6" strokeWidth="1" opacity=".9"/>
+      <circle cx="30" cy="17" r="3.6" fill="#fff176" stroke="#fff8d6" strokeWidth=".8"/>
+      <circle cx="20.4" cy="26.5" r="2.2" fill="#9fe8ff" stroke="#fff8d6" strokeWidth=".7"/>
+      <circle cx="39.6" cy="24.7" r="2.2" fill="#9fe8ff" stroke="#fff8d6" strokeWidth=".7"/>
+      <path d="M16 40 L44 40" stroke="rgba(255,248,180,.7)" strokeWidth=".9"/>
+      <path d="M17 24 L28 24 L22 35 L14 35 Z" fill="rgba(255,255,255,.16)"/>
+      {isTier2&&<><path d="M22.5 22.5 L26 26" stroke="#fff6bf" strokeWidth=".8"/><path d="M37.5 20.8 L34 24.3" stroke="#fff6bf" strokeWidth=".8"/></>}
+      {isTier3&&<><path d="M24 44 L30 40 L36 44" fill="none" stroke="#fff6bf" strokeWidth="1"/><circle cx="30" cy="33" r="2.2" fill="rgba(255,246,191,.7)"/></>}
+    </>}
+
+    {r.baseId==="diamond"&&<>
+      <path d="M30 7 L43 21 L30 49 L17 21 Z" fill={`url(#${gid})`} stroke="#8fd1ff" strokeWidth="1.6"/>
+      <path d="M30 7 L30 49" stroke="rgba(255,255,255,.28)" strokeWidth=".9"/>
+      <path d="M17 21 L43 21" stroke="rgba(255,255,255,.25)" strokeWidth=".9"/>
+      <path d="M17 21 L30 33 L43 21" stroke="rgba(255,255,255,.18)" strokeWidth=".8" fill="none"/>
+      <path d="M21 14 L31 14 L25 26 L18 26 Z" fill="rgba(255,255,255,.16)"/>
+      {isTier2&&<path d="M22 18 L38 18" stroke="rgba(180,230,255,.5)" strokeWidth=".8"/>}
+      {isTier3&&<><path d="M24 36 L30 42 L36 36" fill="none" stroke="rgba(180,230,255,.55)" strokeWidth=".9"/><path d="M24 15 L30 11 L36 15" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth=".8"/></>}
+    </>}
+
+    {r.baseId==="plat"&&<>
+      <path d="M30 8 L34 19 L46 14 L40 25 L52 29 L40 33 L46 45 L34 39 L30 50 L26 39 L14 45 L20 33 L8 29 L20 25 L14 14 L26 19 Z" fill={`url(#${gid})`} stroke="#d9a7ff" strokeWidth="1.5" strokeLinejoin="round"/>
+      <path d="M30 14 L32.5 22 L41 18 L36.5 26 L45 29 L36.5 32 L41 40 L32.5 36 L30 44 L27.5 36 L19 40 L23.5 32 L15 29 L23.5 26 L19 18 L27.5 22 Z" fill="none" stroke="rgba(255,255,255,.34)" strokeWidth=".9" strokeLinejoin="round"/>
+      <circle cx="30" cy="29" r="4.2" fill="#f6d1ff" opacity=".85"/>
+      <path d="M24 17 L31 17 L26.5 28 L21 28 Z" fill="rgba(255,255,255,.14)"/>
+      {isTier2&&<circle cx="30" cy="29" r="7.8" fill="none" stroke="rgba(255,255,255,.28)" strokeWidth=".8"/>}
+      {isTier3&&<>{[0,90,180,270].map(a=>{const rad=a*Math.PI/180;return <line key={a} x1={30+5*Math.cos(rad)} y1={29+5*Math.sin(rad)} x2={30+10*Math.cos(rad)} y2={29+10*Math.sin(rad)} stroke="rgba(255,255,255,.42)" strokeWidth=".75"/>;})}</>}
+    </>}
+
     {isSolar&&<>
-      <circle cx="30" cy="28" r="17" fill="#ffb300" opacity=".12" filter={`url(#${fid})`}/>
-      <circle cx="30" cy="28" r="23" fill="#ff7043" opacity=".08" filter={`url(#${fid})`}/>
+      {Array.from({length:16}).map((_,i)=>{const a=i*22.5*Math.PI/180;const inner=i%2===0?15:17;const outer=i%4===0?31:i%2===0?27:24;const col=i%4===0?"#ffe66d":i%2===0?"#ffca28":"#ff8f3d";return <line key={i} x1={30+inner*Math.cos(a)} y1={29+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={29+outer*Math.sin(a)} stroke={col} strokeWidth={i%4===0?"2.3":"1.5"} strokeLinecap="round" opacity=".95"/>;})}
+      <circle cx="30" cy="29" r="14" fill={`url(#${sid})`} stroke="#ffb300" strokeWidth="1.7"/>
+      <circle cx="30" cy="29" r="10.5" fill="none" stroke="rgba(255,210,110,.45)" strokeWidth=".9"/>
+      <circle cx="30" cy="29" r="6" fill="#fff3b0" opacity=".8"/>
+      <circle cx="30" cy="29" r="2.6" fill="#ffffff" opacity=".95"/>
+      {Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <path key={i} d={`M ${30+12*Math.cos(a)} ${29+12*Math.sin(a)} L ${30+16*Math.cos(a-.09)} ${29+16*Math.sin(a-.09)} L ${30+21*Math.cos(a)} ${29+21*Math.sin(a)} L ${30+16*Math.cos(a+.09)} ${29+16*Math.sin(a+.09)} Z`} fill={i%2===0?"#ffd54f":"#ff7043"} opacity=".5"/>;})}
     </>}
-    {/* Wings for high ranks */}
-    {r.wings&&<>
-      <path d="M2,22 Q-8,28 -5,38 Q0,34 8,32" fill={r.sf} opacity=".6"/>
-      <path d="M2,28 Q-5,32 -3,38 Q2,35 7,35" fill={r.ss} opacity=".4"/>
-      <path d="M58,22 Q68,28 65,38 Q60,34 52,32" fill={r.sf} opacity=".6"/>
-      <path d="M58,28 Q65,32 63,38 Q58,35 53,35" fill={r.ss} opacity=".4"/>
-    </>}
-    {/* Main badge shape */}
-    <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={`url(#${gid})`} stroke={r.si} strokeWidth="1.5"/>
-    <path d="M11 9 L49 9 L54 21 L54 38 L30 61 L6 38 L6 21 Z" fill={r.si} opacity="0.5"/>
-    {/* Shine highlight */}
-    <path d="M14 9 L40 9 L44 17 L30 17 Z" fill="rgba(255,255,255,0.18)"/>
-    <path d="M12 11 L24 11 L18 24 L10 24 Z" fill={`url(#${lid})`} opacity=".35"/>
-    {/* Inner detail layer */}
-    {r.baseId==="bronze"&&<><path d="M16 15 L44 15 L48 25 L48 35 L30 54 L12 35 L12 25 Z" fill="none" stroke={r.ss} strokeWidth=".7" opacity=".6"/><path d="M22 20 L38 20 L41 27 L41 34 L30 46 L19 34 L19 27 Z" fill={r.sf} opacity=".12"/></>}
-    {r.baseId==="silver"&&<><path d="M15 14 L45 14 L49 24 L49 36 L30 55 L11 36 L11 24 Z" fill="none" stroke="rgba(200,220,240,0.5)" strokeWidth=".8"/><line x1="30" y1="14" x2="30" y2="55" stroke="rgba(255,255,255,0.1)" strokeWidth=".5"/></>}
-    {r.baseId==="gold"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="none" stroke={r.ss} strokeWidth=".8" opacity=".78"/>{[20,25,30].map(y=><line key={y} x1="12" y1={y} x2="48" y2={y} stroke="rgba(255,215,0,0.07)" strokeWidth=".6"/>)}
-      <path d="M18 11 L22 6 L27 10 L30 4 L33 10 L38 6 L42 11 L42 16 L18 16 Z" fill={`url(#${cid})`} stroke="#f7d76b" strokeWidth=".9"/>
-      <path d="M20 11 L24 8.5 L27 11.5 L30 7 L33 11.5 L36 8.5 L40 11" fill="none" stroke="#fff7c8" strokeWidth=".8" opacity=".9"/>
-      {[22,30,38].map(x=><circle key={x} cx={x} cy={12} r="1.1" fill="#fff7c8" opacity=".95"/>)}
-    </>}
-    {r.baseId==="diamond"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(136,220,255,0.08)" stroke="rgba(136,220,255,0.4)" strokeWidth=".7"/>{[[22,17,38,17],[14,28,46,28],[10,36,50,36]].map(([x1,y1,x2,y2],i)=><line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(136,220,255,0.12)" strokeWidth=".5"/>)}</>}
-    {r.baseId==="plat"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(206,147,216,0.1)" stroke="rgba(224,176,255,0.5)" strokeWidth=".8"/><circle cx="30" cy="35" r="8" fill="none" stroke="rgba(206,147,216,0.3)" strokeWidth=".7"/></>}
-    {isTier2&&!isSolar&&<>
-      <path d="M18 48 L30 55 L42 48" fill="none" stroke={r.ss} strokeWidth=".95" opacity=".8" strokeLinecap="round"/>
-      <path d="M20 22 L30 18 L40 22" fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth=".8" strokeLinecap="round"/>
-      {[14,46].map(x=><circle key={x} cx={x} cy="31" r="1.2" fill={r.ss} opacity=".75"/>)}
-    </>}
-    {isTier3&&!isSolar&&<>
-      <path d="M18 18 L30 13 L42 18" fill="none" stroke={r.ss} strokeWidth="1.1" opacity=".9" strokeLinecap="round"/>
-      <path d="M13 39 Q30 50 47 39" fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth=".85"/>
-      {[18,30,42].map((x,i)=><circle key={x} cx={x} cy={i===1?22:24} r="1.25" fill="#fff" opacity=".65"/>)}
-    </>}
-    {/* Stars */}
-    {r.nStars===1&&<text x="30" y="42" textAnchor="middle" fontSize="24" fill={r.ss} fontFamily="Arial" style={{filter:`drop-shadow(0 0 3px ${r.ss})`}}>★</text>}
-    {r.nStars===2&&<><text x="21" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text><text x="39" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars===3&&<><text x="16" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text><text x="30" y="39" textAnchor="middle" fontSize="18" fill={r.ss} fontFamily="Arial">★</text><text x="44" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text></>}
-    {r.nStars>=4&&<text x="30" y="41" textAnchor="middle" fontSize="10" fill={r.ss} fontFamily="Arial" letterSpacing="1">{"★".repeat(r.nStars)}</text>}
-    {/* Solar rays */}
-    {isSolar&&<>
-      {Array.from({length:16}).map((_,i)=>{const a=i*22.5*Math.PI/180;const inner=i%2===0?20.5:22.5;const outer=i%4===0?37:i%2===0?33:29;const col=i%4===0?"#fff3a6":i%2===0?"#ffcf33":"#ff8a3d";return <line key={i} x1={30+inner*Math.cos(a)} y1={28+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={28+outer*Math.sin(a)} stroke={col} strokeWidth={i%4===0?"2.4":i%2===0?"1.7":"1.2"} opacity=".9" strokeLinecap="round"/>;})}
-      {Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <path key={i} d={`M ${30+18*Math.cos(a)} ${28+18*Math.sin(a)} L ${30+23*Math.cos(a-.09)} ${28+23*Math.sin(a-.09)} L ${30+29*Math.cos(a)} ${28+29*Math.sin(a)} L ${30+23*Math.cos(a+.09)} ${28+23*Math.sin(a+.09)} Z`} fill={i%2===0?"#ffd54f":"#ff7043"} opacity=".55"/>;})}
-      <circle cx="30" cy="28" r="10" fill={`url(#${sid})`} opacity=".42"/>
-      <circle cx="30" cy="28" r="6" fill="#fff6c2" opacity=".28"/>
-    </>}
+
+    {!isSolar&&dotXs.map((x,i)=><circle key={i} cx={x} cy="61" r="3.1" fill={r.ss} opacity=".95"/>)}
   </svg>
 );}
 

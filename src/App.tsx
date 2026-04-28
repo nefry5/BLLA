@@ -147,29 +147,40 @@ const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},bad
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
 function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><linearGradient id="lpCoin" x1="15%" y1="0%" x2="85%" y2="100%"><stop offset="0%" stopColor="#fff176"/><stop offset="40%" stopColor="#ffd700"/><stop offset="100%" stopColor="#b8860b"/></linearGradient></defs><polygon points="12,1 19.5,4.5 23,12 19.5,19.5 12,23 4.5,19.5 1,12 4.5,4.5" fill="url(#lpCoin)" stroke="#c9940a" strokeWidth="0.7"/><polygon points="12,3.5 17.5,6.2 20,12 17.5,17.8 12,20.5 6.5,17.8 4,12 6.5,6.2" fill="rgba(255,248,120,0.2)"/><polygon points="9,8 15,8 17,12 15,16 9,16 7,12" fill="none" stroke="rgba(255,255,180,0.35)" strokeWidth="0.6"/><text x="12" y="15.8" textAnchor="middle" fontSize="7" fontWeight="900" fill="rgba(100,55,0,0.8)" fontFamily="Arial">$</text></svg>);}
 
-function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;const sid="rs"+r.id+size;
-  const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:4,alpha:.22},bronze:{blur:6,alpha:.32},silver:{blur:8,alpha:.38},gold:{blur:10,alpha:.55},diamond:{blur:12,alpha:.6},plat:{blur:14,alpha:.72},solar:{blur:18,alpha:.92}};
+function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;const sid="rs"+r.id+size;const g2="rg2"+r.id+size;
+  const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:5,alpha:.26},bronze:{blur:7,alpha:.34},silver:{blur:9,alpha:.42},gold:{blur:11,alpha:.62},diamond:{blur:12,alpha:.65},plat:{blur:15,alpha:.8},solar:{blur:20,alpha:.95}};
   const aura=auraMap[r.baseId]||{blur:4,alpha:.2};
   const rankTier=r.sub||1,isTier2=rankTier>=2,isTier3=rankTier>=3,isSolar=r.id==="solar";
-  const dotXs=r.nStars===1?[30]:r.nStars===2?[22,38]:r.nStars===3?[16,30,44]:[];
+  const hasWings=isTier2&&!isSolar;
+  const hasCrest=isTier3&&!isSolar;
   return(
   <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0,overflow:"visible"}}>
     <defs>
       <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient>
+      <linearGradient id={g2} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={r.ss}/><stop offset="55%" stopColor={r.col}/><stop offset="100%" stopColor={r.si}/></linearGradient>
       <radialGradient id={sid} cx="50%" cy="35%" r="70%"><stop offset="0%" stopColor="#ffffff"/><stop offset="28%" stopColor={r.ss}/><stop offset="100%" stopColor={r.col}/></radialGradient>
       <filter id={fid} x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation={aura.blur} result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
     </defs>
 
-    <ellipse cx="30" cy="28" rx={r.baseId==="solar"?22:18} ry={r.baseId==="solar"?22:18} fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+    <ellipse cx="30" cy="28" rx={r.baseId==="solar"?23:19} ry={r.baseId==="solar"?23:19} fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+    {hasWings&&<>
+      <path d="M13 24 L6 19 L7 30 L14 33 Z" fill={`url(#${g2})`} opacity=".92"/>
+      <path d="M47 24 L54 19 L53 30 L46 33 Z" fill={`url(#${g2})`} opacity=".92"/>
+    </>}
+    {hasCrest&&<>
+      <path d="M24 11 L30 6 L36 11 L34 18 L26 18 Z" fill={`url(#${g2})`} opacity=".95"/>
+      <path d="M21 44 L30 53 L39 44 L35 40 L30 45 L25 40 Z" fill={`url(#${g2})`} opacity=".9"/>
+    </>}
 
     {r.baseId==="wood"&&<>
-      <path d="M14 10 L46 10 L50 19 L48 38 L30 55 L12 38 L10 19 Z" fill={`url(#${gid})`} stroke="#9a5b1f" strokeWidth="1.6"/>
-      <path d="M18 14 L42 14 L45 20 L43 35 L30 48 L17 35 L15 20 Z" fill="none" stroke="#d8a25d" strokeWidth="1.1" opacity=".75"/>
-      <path d="M20 21 L40 21" stroke="rgba(255,220,170,.35)" strokeWidth=".9"/>
-      <path d="M18 27 L42 27" stroke="rgba(255,220,170,.18)" strokeWidth=".8"/>
-      <path d="M22 15 L33 15 L26 32 L18 32 Z" fill="rgba(255,255,255,.12)"/>
-      {isTier2&&<path d="M16 18 Q30 13 44 18" fill="none" stroke="#e8c27d" strokeWidth="1" opacity=".75"/>}
-      {isTier3&&<><path d="M20 41 L30 49 L40 41" fill="none" stroke="#f3d39b" strokeWidth="1.1" opacity=".75"/><path d="M30 16 L30 48" stroke="rgba(255,255,255,.18)" strokeWidth=".8"/></>}
+      <path d="M14 10 L46 10 L50 19 L48 38 L30 55 L12 38 L10 19 Z" fill={`url(#${gid})`} stroke="#9a5b1f" strokeWidth="1.7"/>
+      <path d="M18 14 L42 14 L45 20 L43 35 L30 48 L17 35 L15 20 Z" fill="none" stroke="#d8a25d" strokeWidth="1.15" opacity=".78"/>
+      <path d="M20 20 C25 19,35 19,40 20" stroke="rgba(255,220,170,.28)" strokeWidth=".9"/>
+      <path d="M19 26 C24 25,36 25,41 26" stroke="rgba(255,220,170,.18)" strokeWidth=".85"/>
+      <path d="M18.5 33 C23 32,37 32,41.5 33" stroke="rgba(255,220,170,.14)" strokeWidth=".8"/>
+      <path d="M22 15 L34 15 L27 33 L18.5 33 Z" fill="rgba(255,255,255,.12)"/>
+      {isTier2&&<><path d="M16 17 L13 28 L16 38" fill="none" stroke="#e5ba74" strokeWidth="1.15" opacity=".78"/><path d="M44 17 L47 28 L44 38" fill="none" stroke="#e5ba74" strokeWidth="1.15" opacity=".78"/></>}
+      {isTier3&&<><path d="M30 14 L30 47" stroke="rgba(255,232,190,.3)" strokeWidth=".9"/><path d="M21 42 L30 49 L39 42" fill="none" stroke="#efca8a" strokeWidth="1.2" opacity=".82"/></>}
     </>}
 
     {r.baseId==="bronze"&&<>
@@ -183,26 +194,39 @@ function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+si
     </>}
 
     {r.baseId==="silver"&&<>
-      <path d="M16 13 L30 7 L44 13 L44 35 L30 50 L16 35 Z" fill={`url(#${gid})`} stroke="#d9e8f6" strokeWidth="1.6"/>
-      <path d="M20 16 L30 12 L40 16 L40 33 L30 44 L20 33 Z" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="1"/>
-      <path d="M30 8.5 L30 49" stroke="rgba(255,255,255,.25)" strokeWidth=".8"/>
-      <path d="M16.8 13.8 L30 28 L43.2 13.8" stroke="rgba(255,255,255,.18)" strokeWidth=".8" fill="none"/>
-      <path d="M18 14 L26 14 L21 25 L15 25 Z" fill="rgba(255,255,255,.18)"/>
-      {isTier2&&<path d="M20 34 L30 40 L40 34" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth=".9"/>}
-      {isTier3&&<><path d="M20 22 L30 18 L40 22" fill="none" stroke="rgba(255,255,255,.48)" strokeWidth=".9"/><path d="M20 17 L40 17" stroke="rgba(255,255,255,.3)" strokeWidth=".7"/></>}
+      <path d="M16 13 L30 7 L44 13 L44 35 L30 50 L16 35 Z" fill={`url(#${gid})`} stroke="#d9e8f6" strokeWidth="1.7"/>
+      <path d="M20 16 L30 12 L40 16 L40 33 L30 44 L20 33 Z" fill="none" stroke="rgba(255,255,255,.58)" strokeWidth="1.05"/>
+      <path d="M30 8.5 L30 49" stroke="rgba(255,255,255,.28)" strokeWidth=".85"/>
+      <path d="M16.8 13.8 L30 28 L43.2 13.8" stroke="rgba(255,255,255,.2)" strokeWidth=".85" fill="none"/>
+      <path d="M16.2 35.3 L30 28 L43.8 35.3" stroke="rgba(255,255,255,.18)" strokeWidth=".8" fill="none"/>
+      <path d="M18 14 L27 14 L21.5 26 L15.5 26 Z" fill="rgba(255,255,255,.2)"/>
+      {isTier2&&<>
+        <path d="M13 30 L16 21 L21 17" fill="none" stroke="#eef6ff" strokeWidth="1.05" opacity=".85"/>
+        <path d="M47 30 L44 21 L39 17" fill="none" stroke="#eef6ff" strokeWidth="1.05" opacity=".85"/>
+      </>}
+      {isTier3&&<>
+        <path d="M23 40 L30 45 L37 40" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="1"/>
+        <path d="M24 12.5 L30 10 L36 12.5" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth=".9"/>
+      </>}
     </>}
 
     {r.baseId==="gold"&&<>
-      <path d="M12 38 L12 47 L48 47 L48 38" fill={`url(#${gid})`} stroke="#ffdd66" strokeWidth="1.6"/>
-      <path d="M12 38 L18 25 L24 31 L30 17 L36 30 L42 23 L48 38 Z" fill={`url(#${gid})`} stroke="#ffdd66" strokeWidth="1.8" strokeLinejoin="round"/>
-      <path d="M15 38 L21 28.5 L25.5 33.2 L30 21.5 L34.5 32.8 L39 27.2 L45 38" fill="none" stroke="#fff3a6" strokeWidth="1" opacity=".9"/>
-      <circle cx="30" cy="17" r="3.6" fill="#fff176" stroke="#fff8d6" strokeWidth=".8"/>
-      <circle cx="20.4" cy="26.5" r="2.2" fill="#9fe8ff" stroke="#fff8d6" strokeWidth=".7"/>
-      <circle cx="39.6" cy="24.7" r="2.2" fill="#9fe8ff" stroke="#fff8d6" strokeWidth=".7"/>
-      <path d="M16 40 L44 40" stroke="rgba(255,248,180,.7)" strokeWidth=".9"/>
-      <path d="M17 24 L28 24 L22 35 L14 35 Z" fill="rgba(255,255,255,.16)"/>
-      {isTier2&&<><path d="M22.5 22.5 L26 26" stroke="#fff6bf" strokeWidth=".8"/><path d="M37.5 20.8 L34 24.3" stroke="#fff6bf" strokeWidth=".8"/></>}
-      {isTier3&&<><path d="M24 44 L30 40 L36 44" fill="none" stroke="#fff6bf" strokeWidth="1"/><circle cx="30" cy="33" r="2.2" fill="rgba(255,246,191,.7)"/></>}
+      <path d="M13 39 L13 46 L47 46 L47 39" fill={`url(#${gid})`} stroke="#ffd64d" strokeWidth="1.7"/>
+      <path d="M13 39 L18 26 L24 31 L30 17 L36 31 L42 25 L47 39 Z" fill={`url(#${gid})`} stroke="#ffd64d" strokeWidth="1.95" strokeLinejoin="round"/>
+      <path d="M17 39 L22 29.5 L24.8 32.2 L30 21.5 L35.2 32.2 L38 29.5 L43 39" fill="none" stroke="#fff3a6" strokeWidth="1.1" opacity=".92"/>
+      <circle cx="18.5" cy="26.2" r="1.9" fill="#fff2a3" stroke="#fff8d6" strokeWidth=".55"/>
+      <circle cx="30" cy="17" r="3.2" fill="#fff2a3" stroke="#fff8d6" strokeWidth=".7"/>
+      <circle cx="41.5" cy="25.2" r="1.9" fill="#fff2a3" stroke="#fff8d6" strokeWidth=".55"/>
+      <path d="M17 42 L43 42" stroke="rgba(255,248,180,.75)" strokeWidth="1"/>
+      <path d="M17 24 L28 24 L22 35 L15 35 Z" fill="rgba(255,255,255,.18)"/>
+      {isTier2&&<>
+        <path d="M10 32 L13.5 24 L18 22" fill="none" stroke="#ffea8d" strokeWidth="1.05" opacity=".9"/>
+        <path d="M50 32 L46.5 24 L42 22" fill="none" stroke="#ffea8d" strokeWidth="1.05" opacity=".9"/>
+      </>}
+      {isTier3&&<>
+        <path d="M24 47 L30 52 L36 47" fill="none" stroke="#fff0ab" strokeWidth="1.1"/>
+        <path d="M24 14 L30 10.8 L36 14" fill="none" stroke="#fff0ab" strokeWidth="1"/>
+      </>}
     </>}
 
     {r.baseId==="diamond"&&<>
@@ -216,24 +240,28 @@ function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+si
     </>}
 
     {r.baseId==="plat"&&<>
-      <path d="M30 8 L34 19 L46 14 L40 25 L52 29 L40 33 L46 45 L34 39 L30 50 L26 39 L14 45 L20 33 L8 29 L20 25 L14 14 L26 19 Z" fill={`url(#${gid})`} stroke="#d9a7ff" strokeWidth="1.5" strokeLinejoin="round"/>
-      <path d="M30 14 L32.5 22 L41 18 L36.5 26 L45 29 L36.5 32 L41 40 L32.5 36 L30 44 L27.5 36 L19 40 L23.5 32 L15 29 L23.5 26 L19 18 L27.5 22 Z" fill="none" stroke="rgba(255,255,255,.34)" strokeWidth=".9" strokeLinejoin="round"/>
-      <circle cx="30" cy="29" r="4.2" fill="#f6d1ff" opacity=".85"/>
-      <path d="M24 17 L31 17 L26.5 28 L21 28 Z" fill="rgba(255,255,255,.14)"/>
-      {isTier2&&<circle cx="30" cy="29" r="7.8" fill="none" stroke="rgba(255,255,255,.28)" strokeWidth=".8"/>}
-      {isTier3&&<>{[0,90,180,270].map(a=>{const rad=a*Math.PI/180;return <line key={a} x1={30+5*Math.cos(rad)} y1={29+5*Math.sin(rad)} x2={30+10*Math.cos(rad)} y2={29+10*Math.sin(rad)} stroke="rgba(255,255,255,.42)" strokeWidth=".75"/>;})}</>}
+      <path d="M30 8 L34 18 L45 14 L40 24 L52 29 L40 34 L45 45 L34 40 L30 50 L26 40 L15 45 L20 34 L8 29 L20 24 L15 14 L26 18 Z" fill={`url(#${gid})`} stroke="#d9a7ff" strokeWidth="1.55" strokeLinejoin="round"/>
+      <path d="M30 13.5 L32.7 21 L40.5 17.8 L36.7 25.2 L44 29 L36.7 32.8 L40.5 40.2 L32.7 37 L30 44.5 L27.3 37 L19.5 40.2 L23.3 32.8 L16 29 L23.3 25.2 L19.5 17.8 L27.3 21 Z" fill="none" stroke="rgba(255,255,255,.38)" strokeWidth=".95" strokeLinejoin="round"/>
+      <circle cx="30" cy="29" r="4.4" fill="#f6d1ff" opacity=".88"/>
+      <path d="M24 17 L31 17 L26.5 28 L21 28 Z" fill="rgba(255,255,255,.16)"/>
+      {isTier2&&<>
+        <path d="M14 22 L8 19" stroke="#e8c0ff" strokeWidth="1.05"/>
+        <path d="M46 22 L52 19" stroke="#e8c0ff" strokeWidth="1.05"/>
+      </>}
+      {isTier3&&<>
+        <path d="M30 3.5 L30 9" stroke="#edd0ff" strokeWidth="1.05"/>
+        <path d="M30 49.5 L30 56" stroke="#edd0ff" strokeWidth="1.05"/>
+      </>}
     </>}
 
     {isSolar&&<>
-      {Array.from({length:16}).map((_,i)=>{const a=i*22.5*Math.PI/180;const inner=i%2===0?15:17;const outer=i%4===0?31:i%2===0?27:24;const col=i%4===0?"#ffe66d":i%2===0?"#ffca28":"#ff8f3d";return <line key={i} x1={30+inner*Math.cos(a)} y1={29+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={29+outer*Math.sin(a)} stroke={col} strokeWidth={i%4===0?"2.3":"1.5"} strokeLinecap="round" opacity=".95"/>;})}
+      {Array.from({length:18}).map((_,i)=>{const a=i*20*Math.PI/180;const inner=i%2===0?14:16.5;const outer=i%3===0?32:i%2===0?28:24.5;const col=i%3===0?"#ffe66d":i%2===0?"#ff9f1c":"#c2410c";return <line key={i} x1={30+inner*Math.cos(a)} y1={29+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={29+outer*Math.sin(a)} stroke={col} strokeWidth={i%3===0?"2.6":"1.6"} strokeLinecap="round" opacity=".95"/>;})}
       <circle cx="30" cy="29" r="14" fill={`url(#${sid})`} stroke="#ffb300" strokeWidth="1.7"/>
       <circle cx="30" cy="29" r="10.5" fill="none" stroke="rgba(255,210,110,.45)" strokeWidth=".9"/>
       <circle cx="30" cy="29" r="6" fill="#fff3b0" opacity=".8"/>
       <circle cx="30" cy="29" r="2.6" fill="#ffffff" opacity=".95"/>
-      {Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <path key={i} d={`M ${30+12*Math.cos(a)} ${29+12*Math.sin(a)} L ${30+16*Math.cos(a-.09)} ${29+16*Math.sin(a-.09)} L ${30+21*Math.cos(a)} ${29+21*Math.sin(a)} L ${30+16*Math.cos(a+.09)} ${29+16*Math.sin(a+.09)} Z`} fill={i%2===0?"#ffd54f":"#ff7043"} opacity=".5"/>;})}
+      {Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <path key={i} d={`M ${30+12*Math.cos(a)} ${29+12*Math.sin(a)} L ${30+16*Math.cos(a-.09)} ${29+16*Math.sin(a-.09)} L ${30+21*Math.cos(a)} ${29+21*Math.sin(a)} L ${30+16*Math.cos(a+.09)} ${29+16*Math.sin(a+.09)} Z`} fill={i%2===0?"#ffd54f":"#9a3412"} opacity=".5"/>;})}
     </>}
-
-    {!isSolar&&dotXs.map((x,i)=><circle key={i} cx={x} cy="61" r="3.1" fill={r.ss} opacity=".95"/>)}
   </svg>
 );}
 
@@ -318,32 +346,29 @@ function StreakBorderFlames({streak}){
     resize();
     const ro=new ResizeObserver(resize);ro.observe(c);
 
-    // colour palette evolves with streak
-    // <10: yellow/small  10-30: orange  30-70: red/orange  70-150: red  150+: deep red/crimson
     const getColor=(life:number,maxLife:number,sk:number)=>{
       const a=life/maxLife;
-      if(sk<10) return `rgba(255,220,40,${a*.7})`;
-      if(sk<30) return `rgba(255,${Math.round(160-a*60)},0,${a*.8})`;
-      if(sk<70) return `rgba(255,${Math.round(80-a*40)},0,${a*.85})`;
-      if(sk<150) return `rgba(230,${Math.round(30-a*20)},0,${a*.9})`;
-      return `rgba(${Math.round(180+a*40)},0,0,${a*.95})`;
+      if(sk<10) return {core:`rgba(255,232,120,${a*.8})`,mid:`rgba(255,190,60,${a*.55})`,outer:`rgba(255,140,20,${a*.2})`};
+      if(sk<25) return {core:`rgba(255,210,90,${a*.85})`,mid:`rgba(255,132,28,${a*.62})`,outer:`rgba(180,70,20,${a*.24})`};
+      if(sk<50) return {core:`rgba(255,170,80,${a*.88})`,mid:`rgba(255,82,24,${a*.66})`,outer:`rgba(125,45,15,${a*.28})`};
+      if(sk<90) return {core:`rgba(255,120,70,${a*.92})`,mid:`rgba(230,42,18,${a*.7})`,outer:`rgba(95,32,14,${a*.3})`};
+      return {core:`rgba(255,92,72,${a*.96})`,mid:`rgba(255,24,0,${a*.76})`,outer:`rgba(90,22,10,${a*.34})`};
     };
 
     const spawnParticle=(sk:number,W:number,H:number)=>{
-      const t=Math.min(1,sk/120);
-      // side: 0=bottom, 1=left, 2=right (unlocked at higher streaks)
-      const sides=sk<20?[0]:sk<50?[0,0,0,1,2]:[0,0,1,1,2,2];
+      const t=Math.min(1,sk/100);
+      const sides=sk<15?[0]:sk<35?[0,0,1,2]:[1,1,1,2,2,2];
       const side=sides[Math.floor(Math.random()*sides.length)];
       let x,y,vx,vy;
-      if(side===0){x=Math.random()*W;y=H;vx=(Math.random()-.5)*(.8+t*1.4);vy=-(1.2+Math.random()*(1.5+t*3.5));}
-      else if(side===1){x=0;y=Math.random()*H*.7+H*.15;vx=.5+Math.random()*(1+t*2);vy=-(0.5+Math.random()*(1+t*2));}
-      else{x=W;y=Math.random()*H*.7+H*.15;vx=-(0.5+Math.random()*(1+t*2));vy=-(0.5+Math.random()*(1+t*2));}
-      const r=2+t*(6+Math.random()*8);
-      const life=18+Math.random()*(20+t*30);
-      return{x,y,vx,vy,r,life,maxLife:life,side};
+      if(side===0){x=Math.random()*W;y=H+6;vx=(Math.random()-.5)*(.5+t*1.1);vy=-(1+Math.random()*(1.2+t*2.6));}
+      else if(side===1){x=-4+Math.random()*8;y=H*(.92-Math.random()*.36);vx=.25+Math.random()*(.85+t*1.7);vy=-(1.2+Math.random()*(1.4+t*3.2));}
+      else{x=W+4-Math.random()*8;y=H*(.92-Math.random()*.36);vx=-(.25+Math.random()*(.85+t*1.7));vy=-(1.2+Math.random()*(1.4+t*3.2));}
+      const r=(side===0?1.3:1.7)+Math.random()*(1.6+t*5.4);
+      const life=16+Math.random()*(14+t*32);
+      return{x,y,vx,vy,r,life,maxLife:life,side,sway:(Math.random()-.5)*.08,grow:1+Math.random()*.08};
     };
 
-    const maxPts=Math.min(8+Math.floor(streak/5),60);
+    const maxPts=Math.min(12+Math.floor(streak*0.85),140);
     let frame=0;
 
     const draw=()=>{
@@ -351,30 +376,49 @@ function StreakBorderFlames({streak}){
       if(sk<5){ctx.clearRect(0,0,c.width,c.height);af.current=requestAnimationFrame(draw);return;}
       const W=c.width,H=c.height;
       // Spawn
-      if(frame%2===0&&pts.current.length<maxPts){
-        const n=Math.min(2,maxPts-pts.current.length);
+      if(pts.current.length<maxPts){
+        const n=Math.min(sk<20?2:sk<50?4:6,maxPts-pts.current.length);
         for(let i=0;i<n;i++)pts.current.push(spawnParticle(sk,W,H));
       }
       ctx.clearRect(0,0,W,H);
-      // Vignette for high streaks
-      if(sk>=60){
-        const t2=Math.min(1,(sk-60)/200);
-        const g=ctx.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.75);
-        g.addColorStop(0,"transparent");
-        g.addColorStop(1,`rgba(180,0,0,${t2*.45})`);
-        ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+      if(sk>=18){
+        const t2=Math.min(1,sk/90);
+        const edge=ctx.createLinearGradient(0,0,36,0);
+        edge.addColorStop(0,`rgba(255,120,40,${.08+t2*.12})`);
+        edge.addColorStop(1,"rgba(255,120,40,0)");
+        ctx.fillStyle=edge;ctx.fillRect(0,H*.25,42,H*.75);
+        const edgeR=ctx.createLinearGradient(W,0,W-36,0);
+        edgeR.addColorStop(0,`rgba(255,120,40,${.08+t2*.12})`);
+        edgeR.addColorStop(1,"rgba(255,120,40,0)");
+        ctx.fillStyle=edgeR;ctx.fillRect(W-42,H*.25,42,H*.75);
       }
-      // Particles
       pts.current=pts.current.filter(p=>{
-        p.x+=p.vx;p.y+=p.vy;p.life--;
-        p.vx*=.98;p.r=Math.max(.5,p.r*.995);
+        p.life--;
+        p.vx+=Math.sin((p.maxLife-p.life)*.12)*p.sway;
+        p.x+=p.vx;p.y+=p.vy;
+        p.r=Math.max(.6,p.r*p.grow*.992);
         if(p.life<=0)return false;
         const t3=Math.min(1,sk/120);
-        const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*(1.5+t3));
-        grd.addColorStop(0,getColor(p.life,p.maxLife,sk));
-        grd.addColorStop(1,"rgba(0,0,0,0)");
-        ctx.beginPath();ctx.arc(p.x,p.y,p.r*(2+t3*.8),0,Math.PI*2);
-        ctx.fillStyle=grd;ctx.fill();
+        const cols=getColor(p.life,p.maxLife,sk);
+        const len=(p.side===0?1.3:2.1)+t3*2.8;
+        const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*(2.8+t3*1.3));
+        grd.addColorStop(0,cols.core);
+        grd.addColorStop(.45,cols.mid);
+        grd.addColorStop(1,cols.outer);
+        ctx.beginPath();
+        ctx.ellipse(p.x,p.y,p.r*(1.1+t3*.35),p.r*len,0,0,Math.PI*2);
+        ctx.fillStyle=grd;
+        ctx.fill();
+        if(p.side!==0){
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y+p.r*1.1);
+          ctx.quadraticCurveTo(p.x-p.vx*3.8,p.y+p.r*2.8,p.x-p.vx*2.5,p.y+p.r*5.2);
+          ctx.strokeStyle=cols.outer;
+          ctx.lineWidth=Math.max(.8,p.r*.45);
+          ctx.globalAlpha=.35;
+          ctx.stroke();
+          ctx.globalAlpha=1;
+        }
         return true;
       });
       frame++;
@@ -531,7 +575,7 @@ function LessonsTab({words,rs,langKey,T,levelIdx=0}){
   </div>);}
 
 // ── QUIZ ──────────────────────────────────────────────────────────────────
-function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,curXp=0}){
+function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,curXp=0,levelIdx=0}){
   const [fm,setFm]=useState(false);const [ft,setFt]=useState(null);const [showFE,setShowFE]=useState(false);const [fDone,setFDone]=useState(false);
   const [streak,setStreak]=useState(0);const [sessionCards,setSessionCards]=useState(0);const [curWord,setCurWord]=useState(null);const [rev,setRev]=useState(false);
   const [flipped,setFlipped]=useState(false);const [locked,setLocked]=useState(false);
@@ -543,7 +587,12 @@ function QuizTab({words,rs,langKey,T,skinKey,onScore,onMenu,onQP,isActive=true,c
   const latXp=useRef(curXp);useEffect(()=>{latXp.current=curXp;},[curXp]);
   useEffect(()=>{if(!isActive&&prevActive.current){setStreak(0);setSessionCards(0);}prevActive.current=isActive;},[isActive]);
 
-  const getPool=useCallback((cRs,cFm,cFt)=>{if(!cFm||cFt===null)return words;return words.filter(([w])=>{const r=cRs[w];return r!==undefined&&r!==null&&r<cFt*10;});},[words]);
+  const getPool=useCallback((cRs,cFm,cFt)=>{
+    const catFn=CAT_FNS[langKey];
+    const unlockedWords=words.filter(([w])=>(CAT_UNLOCK[catFn(w)]??0)<=levelIdx);
+    if(!cFm||cFt===null)return unlockedWords;
+    return unlockedWords.filter(([w])=>{const r=cRs[w];return r!==undefined&&r!==null&&r<cFt*10;});
+  },[words,langKey,levelIdx]);
   function pick(ex,cRs=latRs.current,cFm=fm,cFt=ft){const pool=getPool(cRs,cFm,cFt);if(!pool.length){if(cFm)setFDone(true);return;}setCurWord(weightedPick(pool,cRs,ex));setRev(Math.random()<.5);setFlipped(false);setLocked(false);}
   useEffect(()=>{pick(null);},[]);
   function startFocus(thresh){setFt(thresh);setFm(true);setShowFE(false);SFX.focus();const pool=getPool(latRs.current,true,thresh);if(!pool.length){setFDone(true);return;}setCurWord(weightedPick(pool,latRs.current,null));setRev(Math.random()<.5);setFlipped(false);setLocked(false);}
@@ -897,7 +946,7 @@ export default function App(){
     </div>
     <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",position:"relative"}}>
       <div style={{display:tab==="lessons"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><LessonsTab words={words} rs={langState.rawScores} langKey={lang} T={T} levelIdx={curLevelIdx}/></div>
-      <div style={{display:tab==="quiz"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP} isActive={tab==="quiz"} curXp={langState.xp||0}/></div>
+      <div style={{display:tab==="quiz"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuizTab words={words} rs={langState.rawScores} langKey={lang} T={T} skinKey={skinKey} onScore={handleScore} onMenu={()=>{SFX.nav();setScreen("home");setLang(null);}} onQP={handleQP} isActive={tab==="quiz"} curXp={langState.xp||0} levelIdx={curLevelIdx}/></div>
       <div style={{display:tab==="quests"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><QuestsTab quests={questsData} questDef={questDef} weeklyQuests={weeklyQuestsData} weeklyQuestDef={weeklyQuestDef} T={T}/></div>
       <div style={{display:tab==="shop"?"flex":"none",flex:1,flexDirection:"column",overflow:"hidden"}}><ShopTab langState={langState} T={T} onEquip={handleEquip} onOpenBox={handleOpenBox}/></div>
     </div>

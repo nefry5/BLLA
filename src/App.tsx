@@ -11,7 +11,7 @@ lootS:()=>{[261,330,523,784,1047].forEach((f,i)=>tn(f,"triangle",.38,.3,i*.09));
 };
 const getScore=r=>r==null?null:r/10,updateRaw=(r,ok)=>Math.max(0,Math.min(100,(r??0)+(ok?10:-20))),noteCol=s=>s==null?"#444":s<4?"#e74c3c":s<7?"#f39c12":"#27ae60",xpGain=s=>10+Math.floor(Math.min(s,1000)/2),genUUID=()=>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&0x3|0x8)).toString(16);});
 const fmtCoins=(n:number)=>n>=1e6?`${(n/1e6).toFixed(1)}M`:n>=1000?`${(n/1000).toFixed(1)}k`:`${n}`;
-const BASE_RANKS={wood:{col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",wings:false},bronze:{col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",wings:false},silver:{col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",wings:false},gold:{col:"#ffd700",glow:"#ffe44d",sf:"#FFD700",si:"#2266AA",ss:"#FFF44D",wings:true},diamond:{col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",wings:true},plat:{col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",wings:true},solar:{col:"#ff9800",glow:"#ffcc44",sf:"#FF6600",si:"#AA2200",ss:"#FFE044",wings:true}};
+const BASE_RANKS={wood:{col:"#c87941",glow:"#d4924d",sf:"#8B5A2B",si:"#5a2e0a",ss:"#D4A060",wings:false},bronze:{col:"#cd7f32",glow:"#e89040",sf:"#CD7F32",si:"#8B5A20",ss:"#E8B060",wings:false},silver:{col:"#a0b8c8",glow:"#c0d8e8",sf:"#8898A8",si:"#4A6070",ss:"#D0E0F0",wings:false},gold:{col:"#ffd700",glow:"#ffe44d",sf:"#FFE066",si:"#9A5A00",ss:"#FFF7A8",wings:true},diamond:{col:"#4fc3f7",glow:"#88ddff",sf:"#1144AA",si:"#0A2288",ss:"#66BBFF",wings:true},plat:{col:"#ce93d8",glow:"#e0b0ff",sf:"#7722CC",si:"#5511AA",ss:"#DDB0FF",wings:true},solar:{col:"#ff9800",glow:"#ffcc44",sf:"#FF7A00",si:"#A32200",ss:"#FFE86A",wings:true}};
 const _rl=(bid,sub,l,cumXP,xpCap)=>({...BASE_RANKS[bid],id:sub===0?bid:bid+sub,baseId:bid,sub,l,cumXP,xpCap,nStars:sub===0?5:sub});
 const RANK_LEVELS=[_rl("wood",1,"Bois I",0,100),_rl("wood",2,"Bois II",100,200),_rl("wood",3,"Bois III",300,300),_rl("bronze",1,"Bronze I",600,400),_rl("bronze",2,"Bronze II",1000,500),_rl("bronze",3,"Bronze III",1500,800),_rl("silver",1,"Argent I",2300,900),_rl("silver",2,"Argent II",3200,1000),_rl("silver",3,"Argent III",4200,1200),_rl("gold",1,"Or I",5400,1400),_rl("gold",2,"Or II",6800,1600),_rl("gold",3,"Or III",8400,2000),_rl("diamond",1,"Diamant I",10400,2500),_rl("diamond",2,"Diamant II",12900,3000),_rl("diamond",3,"Diamant III",15900,5000),_rl("plat",1,"Platine I",20900,10000),_rl("plat",2,"Platine II",30900,15000),_rl("plat",3,"Platine III",45900,25000),_rl("solar",0,"Solaire",70900,Infinity)];
 const RANK_REWARDS={1:{coins:50},2:{coins:75},3:{coins:100},4:{coins:150},5:{coins:200},6:{coins:250},7:{coins:300},8:{coins:350},9:{coins:500},10:{coins:600},11:{coins:700},12:{coins:1000},13:{coins:1200},14:{coins:1500},15:{coins:2000},16:{coins:2500},17:{coins:3000},18:{coins:5000}};
@@ -147,14 +147,18 @@ const DEF={uuid:null,pseudo:null,langs:{en:mkL(),de:mkL(),es:mkL(),it:mkL()},bad
 // ── SVG COMPONENTS ────────────────────────────────────────────────────────
 function CoinIcon({size=16}){return(<svg width={size} height={size} viewBox="0 0 24 24" style={{flexShrink:0,display:"inline-block",verticalAlign:"middle"}}><defs><linearGradient id="lpCoin" x1="15%" y1="0%" x2="85%" y2="100%"><stop offset="0%" stopColor="#fff176"/><stop offset="40%" stopColor="#ffd700"/><stop offset="100%" stopColor="#b8860b"/></linearGradient></defs><polygon points="12,1 19.5,4.5 23,12 19.5,19.5 12,23 4.5,19.5 1,12 4.5,4.5" fill="url(#lpCoin)" stroke="#c9940a" strokeWidth="0.7"/><polygon points="12,3.5 17.5,6.2 20,12 17.5,17.8 12,20.5 6.5,17.8 4,12 6.5,6.2" fill="rgba(255,248,120,0.2)"/><polygon points="9,8 15,8 17,12 15,16 9,16 7,12" fill="none" stroke="rgba(255,255,180,0.35)" strokeWidth="0.6"/><text x="12" y="15.8" textAnchor="middle" fontSize="7" fontWeight="900" fill="rgba(100,55,0,0.8)" fontFamily="Arial">$</text></svg>);}
 
-function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;
+function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+size;const fid="rf"+r.id+size;const sid="rs"+r.id+size;const cid="rc"+r.id+size;const lid="rl"+r.id+size;
   // Aura intensity per base rank
   const auraMap:{[k:string]:{blur:number,alpha:number}}={wood:{blur:3,alpha:.2},bronze:{blur:5,alpha:.35},silver:{blur:6,alpha:.4},gold:{blur:9,alpha:.55},diamond:{blur:12,alpha:.65},plat:{blur:14,alpha:.75},solar:{blur:18,alpha:.9}};
   const aura=auraMap[r.baseId]||{blur:3,alpha:.2};
+  const rankTier=r.sub||1,isTier2=rankTier>=2,isTier3=rankTier>=3,isSolar=r.id==="solar";
   return(
   <svg width={size} height={size*1.15} viewBox="0 0 60 69" style={{opacity,flexShrink:0,overflow:"visible"}}>
     <defs>
       <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={r.sf}/><stop offset="100%" stopColor={r.si}/></linearGradient>
+      <radialGradient id={sid} cx="50%" cy="40%" r="65%"><stop offset="0%" stopColor="#fff6c2"/><stop offset="45%" stopColor={r.ss}/><stop offset="100%" stopColor={r.col}/></radialGradient>
+      <linearGradient id={cid} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fffbd4"/><stop offset="35%" stopColor="#ffe47a"/><stop offset="70%" stopColor="#ffca28"/><stop offset="100%" stopColor="#b86a00"/></linearGradient>
+      <linearGradient id={lid} x1="20%" y1="0%" x2="80%" y2="100%"><stop offset="0%" stopColor="#fffef6"/><stop offset="100%" stopColor="rgba(255,255,255,0)"/></linearGradient>
       <filter id={fid} x="-40%" y="-40%" width="180%" height="180%">
         <feGaussianBlur stdDeviation={aura.blur} result="blur"/>
         <feComposite in="SourceGraphic" in2="blur" operator="over"/>
@@ -162,6 +166,10 @@ function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+si
     </defs>
     {/* Aura glow */}
     <path d="M8 6 L52 6 L58 19 L58 40 L30 66 L2 40 L2 19 Z" fill={r.glow} opacity={aura.alpha} filter={`url(#${fid})`}/>
+    {isSolar&&<>
+      <circle cx="30" cy="28" r="17" fill="#ffb300" opacity=".12" filter={`url(#${fid})`}/>
+      <circle cx="30" cy="28" r="23" fill="#ff7043" opacity=".08" filter={`url(#${fid})`}/>
+    </>}
     {/* Wings for high ranks */}
     {r.wings&&<>
       <path d="M2,22 Q-8,28 -5,38 Q0,34 8,32" fill={r.sf} opacity=".6"/>
@@ -174,21 +182,38 @@ function RankBadge({rank,size=48,opacity=1}){const r=rank;const gid="rg"+r.id+si
     <path d="M11 9 L49 9 L54 21 L54 38 L30 61 L6 38 L6 21 Z" fill={r.si} opacity="0.5"/>
     {/* Shine highlight */}
     <path d="M14 9 L40 9 L44 17 L30 17 Z" fill="rgba(255,255,255,0.18)"/>
+    <path d="M12 11 L24 11 L18 24 L10 24 Z" fill={`url(#${lid})`} opacity=".35"/>
     {/* Inner detail layer */}
     {r.baseId==="bronze"&&<><path d="M16 15 L44 15 L48 25 L48 35 L30 54 L12 35 L12 25 Z" fill="none" stroke={r.ss} strokeWidth=".7" opacity=".6"/><path d="M22 20 L38 20 L41 27 L41 34 L30 46 L19 34 L19 27 Z" fill={r.sf} opacity=".12"/></>}
     {r.baseId==="silver"&&<><path d="M15 14 L45 14 L49 24 L49 36 L30 55 L11 36 L11 24 Z" fill="none" stroke="rgba(200,220,240,0.5)" strokeWidth=".8"/><line x1="30" y1="14" x2="30" y2="55" stroke="rgba(255,255,255,0.1)" strokeWidth=".5"/></>}
-    {r.baseId==="gold"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="none" stroke={r.ss} strokeWidth=".8" opacity=".7"/>{[20,25,30].map(y=><line key={y} x1="12" y1={y} x2="48" y2={y} stroke="rgba(255,215,0,0.07)" strokeWidth=".6"/>)}</>}
+    {r.baseId==="gold"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="none" stroke={r.ss} strokeWidth=".8" opacity=".78"/>{[20,25,30].map(y=><line key={y} x1="12" y1={y} x2="48" y2={y} stroke="rgba(255,215,0,0.07)" strokeWidth=".6"/>)}
+      <path d="M18 11 L22 6 L27 10 L30 4 L33 10 L38 6 L42 11 L42 16 L18 16 Z" fill={`url(#${cid})`} stroke="#f7d76b" strokeWidth=".9"/>
+      <path d="M20 11 L24 8.5 L27 11.5 L30 7 L33 11.5 L36 8.5 L40 11" fill="none" stroke="#fff7c8" strokeWidth=".8" opacity=".9"/>
+      {[22,30,38].map(x=><circle key={x} cx={x} cy={12} r="1.1" fill="#fff7c8" opacity=".95"/>)}
+    </>}
     {r.baseId==="diamond"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(136,220,255,0.08)" stroke="rgba(136,220,255,0.4)" strokeWidth=".7"/>{[[22,17,38,17],[14,28,46,28],[10,36,50,36]].map(([x1,y1,x2,y2],i)=><line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(136,220,255,0.12)" strokeWidth=".5"/>)}</>}
     {r.baseId==="plat"&&<><path d="M14 13 L46 13 L50 24 L50 36 L30 56 L10 36 L10 24 Z" fill="rgba(206,147,216,0.1)" stroke="rgba(224,176,255,0.5)" strokeWidth=".8"/><circle cx="30" cy="35" r="8" fill="none" stroke="rgba(206,147,216,0.3)" strokeWidth=".7"/></>}
+    {isTier2&&!isSolar&&<>
+      <path d="M18 48 L30 55 L42 48" fill="none" stroke={r.ss} strokeWidth=".95" opacity=".8" strokeLinecap="round"/>
+      <path d="M20 22 L30 18 L40 22" fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth=".8" strokeLinecap="round"/>
+      {[14,46].map(x=><circle key={x} cx={x} cy="31" r="1.2" fill={r.ss} opacity=".75"/>)}
+    </>}
+    {isTier3&&!isSolar&&<>
+      <path d="M18 18 L30 13 L42 18" fill="none" stroke={r.ss} strokeWidth="1.1" opacity=".9" strokeLinecap="round"/>
+      <path d="M13 39 Q30 50 47 39" fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth=".85"/>
+      {[18,30,42].map((x,i)=><circle key={x} cx={x} cy={i===1?22:24} r="1.25" fill="#fff" opacity=".65"/>)}
+    </>}
     {/* Stars */}
     {r.nStars===1&&<text x="30" y="42" textAnchor="middle" fontSize="24" fill={r.ss} fontFamily="Arial" style={{filter:`drop-shadow(0 0 3px ${r.ss})`}}>★</text>}
     {r.nStars===2&&<><text x="21" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text><text x="39" y="42" textAnchor="middle" fontSize="17" fill={r.ss} fontFamily="Arial">★</text></>}
     {r.nStars===3&&<><text x="16" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text><text x="30" y="39" textAnchor="middle" fontSize="18" fill={r.ss} fontFamily="Arial">★</text><text x="44" y="44" textAnchor="middle" fontSize="13" fill={r.ss} fontFamily="Arial">★</text></>}
     {r.nStars>=4&&<text x="30" y="41" textAnchor="middle" fontSize="10" fill={r.ss} fontFamily="Arial" letterSpacing="1">{"★".repeat(r.nStars)}</text>}
     {/* Solar rays */}
-    {r.id==="solar"&&<>
-      {Array.from({length:12}).map((_,i)=>{const a=i*30*Math.PI/180;const inner=i%2===0?22:24;const outer=i%2===0?30:27;return <line key={i} x1={30+inner*Math.cos(a)} y1={28+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={28+outer*Math.sin(a)} stroke={r.ss} strokeWidth={i%2===0?"1.8":"1"} opacity=".8"/>;})}
-      <circle cx="30" cy="28" r="7" fill={r.ss} opacity=".15"/>
+    {isSolar&&<>
+      {Array.from({length:16}).map((_,i)=>{const a=i*22.5*Math.PI/180;const inner=i%2===0?20.5:22.5;const outer=i%4===0?37:i%2===0?33:29;const col=i%4===0?"#fff3a6":i%2===0?"#ffcf33":"#ff8a3d";return <line key={i} x1={30+inner*Math.cos(a)} y1={28+inner*Math.sin(a)} x2={30+outer*Math.cos(a)} y2={28+outer*Math.sin(a)} stroke={col} strokeWidth={i%4===0?"2.4":i%2===0?"1.7":"1.2"} opacity=".9" strokeLinecap="round"/>;})}
+      {Array.from({length:8}).map((_,i)=>{const a=(i*45+22.5)*Math.PI/180;return <path key={i} d={`M ${30+18*Math.cos(a)} ${28+18*Math.sin(a)} L ${30+23*Math.cos(a-.09)} ${28+23*Math.sin(a-.09)} L ${30+29*Math.cos(a)} ${28+29*Math.sin(a)} L ${30+23*Math.cos(a+.09)} ${28+23*Math.sin(a+.09)} Z`} fill={i%2===0?"#ffd54f":"#ff7043"} opacity=".55"/>;})}
+      <circle cx="30" cy="28" r="10" fill={`url(#${sid})`} opacity=".42"/>
+      <circle cx="30" cy="28" r="6" fill="#fff6c2" opacity=".28"/>
     </>}
   </svg>
 );}
